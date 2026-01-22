@@ -3,102 +3,102 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GURU DE BANCA — Simulador de Banca Chata</title>
+  <title>GURU DE BANCA — v2</title>
 
-  <!-- PDF.js (CDN) -->
+  <!-- PDF.js (opcional) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <!-- jsPDF (CDN) -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root{
-      --bg:#0b1220;
-      --card:#111a2e;
-      --card2:#0f1730;
-      --text:#eaf0ff;
-      --muted:#a8b3d6;
-      --line:rgba(255,255,255,.10);
-      --accent:#7c3aed;
-      --good:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
-      --shadow:0 18px 50px rgba(0,0,0,.35);
+      --bg1:#f7fbff;
+      --bg2:#fff7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:rgba(15,23,42,.12);
+      --shadow:0 18px 50px rgba(2,6,23,.10);
       --r:18px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --p:#7c3aed;   /* roxo */
+      --b:#0ea5e9;   /* azul */
+      --g:#22c55e;   /* verde */
+      --y:#f59e0b;   /* amarelo */
+      --r2:#ef4444;  /* vermelho */
     }
+
     *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
-      background: radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.22), transparent 60%),
-                  radial-gradient(900px 600px at 90% 20%, rgba(34,197,94,.12), transparent 55%),
-                  radial-gradient(1000px 700px at 40% 90%, rgba(245,158,11,.14), transparent 55%),
-                  var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color:var(--text);
+      background:
+        radial-gradient(900px 520px at 10% 10%, rgba(14,165,233,.20), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(124,58,237,.18), transparent 60%),
+        radial-gradient(900px 520px at 20% 90%, rgba(34,197,94,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       min-height:100vh;
     }
+
     header{
       position:sticky; top:0; z-index:9;
+      background: rgba(255,255,255,.75);
       backdrop-filter: blur(10px);
-      background: rgba(11,18,32,.75);
       border-bottom:1px solid var(--line);
     }
-    .wrap{ max-width:1100px; margin:0 auto; padding:16px; }
+    .wrap{ max-width:1160px; margin:0 auto; padding:16px; }
+
     .top{
-      display:flex; align-items:center; gap:14px; justify-content:space-between;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
     }
     .brand{
-      display:flex; align-items:center; gap:12px;
+      display:flex; gap:12px; align-items:center;
     }
     .logo{
-      width:42px; height:42px; border-radius:12px;
-      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
+      width:44px; height:44px; border-radius:14px;
+      background: conic-gradient(from 210deg, var(--p), var(--b), var(--g), var(--y), var(--p));
       box-shadow: var(--shadow);
     }
-    h1{ font-size:16px; margin:0; letter-spacing:.4px; }
+    h1{ margin:0; font-size:16px; letter-spacing:.3px; }
     .sub{ font-size:12px; color:var(--muted); margin-top:2px; }
     .pill{
       font-size:12px; color:var(--muted);
       border:1px solid var(--line);
+      background: rgba(255,255,255,.7);
       padding:8px 10px; border-radius:999px;
-      background: rgba(255,255,255,.03);
+      box-shadow: 0 10px 26px rgba(2,6,23,.06);
     }
 
-    main{ padding:18px 0 48px; }
+    main{ padding:18px 0 54px; }
     .grid{
       display:grid;
-      grid-template-columns: 1.1fr .9fr;
+      grid-template-columns: 1.15fr .85fr;
       gap:16px;
     }
-    @media (max-width: 920px){
-      .grid{ grid-template-columns:1fr; }
-    }
+    @media (max-width: 980px){ .grid{ grid-template-columns:1fr; } }
 
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      background: rgba(255,255,255,.92);
       border:1px solid var(--line);
       border-radius: var(--r);
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .card .hd{
+    .hd{
       padding:14px 14px 10px;
       border-bottom:1px solid var(--line);
       display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-      background: rgba(0,0,0,.12);
+      background: linear-gradient(90deg, rgba(124,58,237,.10), rgba(14,165,233,.08), rgba(34,197,94,.08));
     }
-    .card .hd h2{
-      margin:0; font-size:14px; letter-spacing:.3px;
-    }
-    .card .hd .hint{
-      color:var(--muted); font-size:12px; line-height:1.2;
-    }
-    .card .bd{ padding:14px; }
+    .hd h2{ margin:0; font-size:14px; letter-spacing:.3px; }
+    .hd .hint{ font-size:12px; color:var(--muted); line-height:1.2; }
+    .bd{ padding:14px; }
 
     label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
-    input[type="file"], select, textarea, input[type="text"]{
+    input[type="file"], select, textarea, input[type="text"], input[type="number"]{
       width:100%;
-      background: rgba(255,255,255,.04);
+      background: rgba(2,6,23,.03);
       border:1px solid var(--line);
       color: var(--text);
       padding:10px 12px;
@@ -106,125 +106,172 @@
       outline:none;
     }
     textarea{ min-height:130px; resize:vertical; }
+
     .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    @media (max-width: 520px){ .row{ grid-template-columns:1fr; } }
+    @media (max-width: 560px){ .row{ grid-template-columns:1fr; } }
 
     .btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+
     button{
       border:0;
       padding:10px 12px;
       border-radius: 14px;
-      color: var(--text);
-      background: rgba(124,58,237,.9);
       cursor:pointer;
-      box-shadow: 0 10px 24px rgba(124,58,237,.18);
+      font-weight:800;
+      color:#fff;
+      background: linear-gradient(135deg, var(--p), var(--b));
+      box-shadow: 0 14px 28px rgba(124,58,237,.18);
       transition: transform .05s ease;
-      font-weight:600;
     }
     button:active{ transform: translateY(1px); }
     button.secondary{
-      background: rgba(255,255,255,.06);
+      color:var(--text);
+      background: rgba(255,255,255,.9);
       border:1px solid var(--line);
-      box-shadow:none;
-      font-weight:600;
+      box-shadow: 0 14px 28px rgba(2,6,23,.06);
     }
-    button.danger{ background: rgba(239,68,68,.9); box-shadow: 0 10px 24px rgba(239,68,68,.18); }
-    button.good{ background: rgba(34,197,94,.9); box-shadow: 0 10px 24px rgba(34,197,94,.18); }
+    button.good{
+      background: linear-gradient(135deg, var(--g), rgba(34,197,94,.78));
+      box-shadow: 0 14px 28px rgba(34,197,94,.18);
+    }
+    button.warn{
+      background: linear-gradient(135deg, var(--y), rgba(245,158,11,.78));
+      box-shadow: 0 14px 28px rgba(245,158,11,.18);
+    }
+    button.danger{
+      background: linear-gradient(135deg, var(--r2), rgba(239,68,68,.78));
+      box-shadow: 0 14px 28px rgba(239,68,68,.18);
+    }
 
     .kpis{
-      display:grid; grid-template-columns: repeat(3, 1fr);
+      display:grid; grid-template-columns: repeat(4, 1fr);
       gap:10px;
     }
-    @media (max-width: 520px){ .kpis{ grid-template-columns:1fr; } }
-
+    @media (max-width: 760px){ .kpis{ grid-template-columns:1fr 1fr; } }
     .kpi{
       border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.9);
       border-radius: 16px;
       padding:10px 12px;
     }
-    .kpi .v{ font-size:18px; font-weight:800; }
+    .kpi .v{ font-size:18px; font-weight:900; }
     .kpi .t{ font-size:12px; color:var(--muted); margin-top:4px; }
 
-    .mono{ font-family: var(--mono); font-size:12px; color:var(--muted); }
     .hr{ height:1px; background: var(--line); margin:12px 0; }
+
+    .committee{
+      border:1px dashed rgba(15,23,42,.18);
+      background: rgba(14,165,233,.06);
+      border-radius:16px;
+      padding:12px;
+    }
+    .committee h3{ margin:0 0 10px; font-size:13px; }
+    .committeeList{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .member{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding:10px;
+    }
+    .memberTop{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .memberTop b{ font-size:13px; }
+    .chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .chip{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color: var(--muted);
+    }
 
     .prof{
       display:flex; gap:12px; align-items:flex-start;
       padding:12px;
       border-radius:16px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.92);
     }
     .avatar{
       width:44px; height:44px; border-radius:14px;
-      background: radial-gradient(circle at 30% 30%, rgba(245,158,11,.9), rgba(124,58,237,.9));
+      background: conic-gradient(from 210deg, var(--y), var(--p), var(--b), var(--g), var(--y));
       box-shadow: var(--shadow);
       flex:0 0 auto;
     }
-    .prof .name{ font-weight:800; font-size:13px; }
+    .prof .name{ font-weight:900; font-size:13px; }
     .prof .role{ color:var(--muted); font-size:12px; margin-top:2px; }
     .prof .msg{ margin-top:8px; font-size:13px; line-height:1.35; }
 
+    .tags{ margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
     .tag{
-      display:inline-block;
       font-size:11px;
       padding:4px 8px;
       border-radius:999px;
       border:1px solid var(--line);
-      color: var(--muted);
-      background: rgba(255,255,255,.03);
-      margin-right:6px;
-      margin-top:6px;
+      background: rgba(124,58,237,.08);
+      color: rgba(124,58,237,.95);
     }
 
     .feedback{
       border:1px solid var(--line);
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.92);
       border-radius: 16px;
       padding:12px;
       margin-top:12px;
     }
     .feedback h3{ margin:0 0 6px; font-size:13px; }
-    .list{ margin:8px 0 0; padding-left:18px; color:var(--text); }
-    .list li{ margin:6px 0; color:var(--text); }
-    .muted{ color:var(--muted); }
-
     .small{ font-size:12px; color:var(--muted); }
-    .hide{ display:none !important; }
+    .list{ margin:8px 0 0; padding-left:18px; }
+    .list li{ margin:6px 0; }
 
-    .scorebar{
-      height:10px; border-radius:999px; background: rgba(255,255,255,.08);
-      overflow:hidden; border:1px solid var(--line);
+    .bar{
+      height:10px; border-radius:999px; background: rgba(2,6,23,.06);
+      border:1px solid var(--line);
+      overflow:hidden;
     }
-    .scorefill{
+    .fill{
       height:100%; width:0%;
-      background: linear-gradient(90deg, rgba(239,68,68,.9), rgba(245,158,11,.9), rgba(34,197,94,.9));
+      background: linear-gradient(90deg, var(--r2), var(--y), var(--g));
     }
 
     .toast{
       position:fixed; right:16px; bottom:16px;
-      background: rgba(17,26,46,.96);
+      background: rgba(255,255,255,.96);
       border:1px solid var(--line);
       color: var(--text);
       padding:12px 12px;
       border-radius: 16px;
       box-shadow: var(--shadow);
-      max-width: 360px;
+      max-width: 380px;
       z-index:999;
     }
-    .toast .t{ font-weight:800; font-size:13px; }
+    .toast .t{ font-weight:900; font-size:13px; }
     .toast .b{ margin-top:6px; font-size:12px; color:var(--muted); line-height:1.35; }
+    .hide{ display:none !important; }
+
+    /* Confetti overlay */
+    #confettiCanvas{
+      position:fixed; inset:0;
+      pointer-events:none;
+      z-index:998;
+    }
   </style>
 </head>
+
 <body>
+<canvas id="confettiCanvas"></canvas>
+
 <header>
   <div class="wrap top">
     <div class="brand">
       <div class="logo"></div>
       <div>
         <h1>GURU DE BANCA</h1>
-        <div class="sub">Simulador de banca chata (TCC • Mestrado • Doutorado) + relatório final em PDF</div>
+        <div class="sub">Banca realista, chata e útil — baseada no seu resumo (PDF é opcional)</div>
       </div>
     </div>
     <div class="pill">Modo: <span id="modePill">—</span></div>
@@ -238,19 +285,17 @@
     <section class="card">
       <div class="hd">
         <div>
-          <h2>1) Upload + Configuração</h2>
-          <div class="hint">Carregue seu PDF e escolha o nível/área. Eu vou te apertar com perguntas de banca (daquelas que dão frio na espinha).</div>
+          <h2>1) Dados do trabalho + banca</h2>
+          <div class="hint">
+            Cole o <b>resumo</b> (obrigatório). O PDF pode falhar se for escaneado (imagem).  
+            Com o resumo, eu te aperto com perguntas <b>específicas</b>.
+          </div>
         </div>
       </div>
+
       <div class="bd">
-
-        <label>Seu nome (opcional — vai no relatório)</label>
-        <input id="studentName" type="text" placeholder="Ex: Ana Silva" />
-
-        <div style="height:10px"></div>
-
-        <label>Upload do PDF (TCC / Dissertação / Tese)</label>
-        <input id="pdfInput" type="file" accept="application/pdf" />
+        <label>Seu nome (vai no relatório)</label>
+        <input id="studentName" type="text" placeholder="Ex: Ernandes" />
 
         <div style="height:10px"></div>
 
@@ -276,16 +321,91 @@
 
         <div style="height:10px"></div>
 
-        <label>Nível da banca</label>
-        <select id="severity">
-          <option value="calm">Tranquila</option>
-          <option value="tech">Técnica</option>
-          <option value="hard" selected>Chata (recomendada)</option>
-        </select>
+        <div class="row">
+          <div>
+            <label>Tipo de estudo</label>
+            <select id="studyType">
+              <option value="quant">Quantitativo</option>
+              <option value="qual">Qualitativo</option>
+              <option value="mixed">Misto</option>
+              <option value="theory">Teórico/Conceitual</option>
+              <option value="applied">Aplicado/Intervenção</option>
+              <option value="review">Revisão (sist./narrativa)</option>
+            </select>
+          </div>
+          <div>
+            <label>Nível da banca</label>
+            <select id="severity">
+              <option value="calm">Tranquila</option>
+              <option value="tech">Técnica</option>
+              <option value="hard" selected>Chata</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <label>Resumo/Abstract do trabalho (OBRIGATÓRIO)</label>
+        <textarea id="abstractText" placeholder="Cole aqui o resumo do trabalho. É disso que eu vou tirar as perguntas (objetivo, método, dados, contribuição, limites)."></textarea>
+
+        <div style="height:10px"></div>
+
+        <label>Upload do PDF (OPCIONAL — pode falhar se for escaneado)</label>
+        <input id="pdfInput" type="file" accept="application/pdf" />
+
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <div>
+            <label>Quantidade de perguntas</label>
+            <input id="nQuestions" type="number" min="8" max="60" value="24" />
+          </div>
+          <div>
+            <label>Mistura de dificuldade</label>
+            <select id="difficultyMix">
+              <option value="balanced" selected>Balanceado (30% fácil / 40% média / 30% difícil)</option>
+              <option value="easy">Mais fácil (50/35/15)</option>
+              <option value="hard">Mais difícil (20/35/45)</option>
+              <option value="random">Total aleatório</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="committee">
+          <h3>2) Sua banca (nomes + perfis)</h3>
+
+          <div class="row">
+            <div>
+              <label>Nome do avaliador(a)</label>
+              <input id="memberName" type="text" placeholder="Ex: Profa. Maria" />
+            </div>
+            <div>
+              <label>Perfil (pode escolher mais de um depois)</label>
+              <select id="memberPrimary">
+                <option value="method">Metodológico(a)</option>
+                <option value="theory">Teórico(a)</option>
+                <option value="stats">Estatístico(a)</option>
+                <option value="qual">Qualitativo(a)</option>
+                <option value="critical">Crítico(a) / Implicante</option>
+                <option value="practical">Prático(a) / Políticas públicas</option>
+                <option value="nice">Bonzinho(a)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="good" id="btnAddMember">Adicionar avaliador</button>
+            <button class="secondary" id="btnAdd3Default">Criar banca padrão (3)</button>
+          </div>
+
+          <div class="committeeList" id="committeeList"></div>
+        </div>
 
         <div class="btns">
-          <button class="good" id="btnAnalyze">Analisar PDF e começar</button>
-          <button class="secondary" id="btnLoadDemo">Usar modo DEMO (sem PDF)</button>
+          <button class="good" id="btnStart">Analisar e começar simulação</button>
+          <button class="secondary" id="btnDemo">Carregar DEMO real</button>
           <button class="secondary" id="btnResume">Retomar sessão salva</button>
           <button class="danger" id="btnReset">Resetar tudo</button>
         </div>
@@ -294,22 +414,25 @@
 
         <div class="kpis">
           <div class="kpi">
-            <div class="v" id="kpiPages">—</div>
-            <div class="t">Páginas lidas</div>
+            <div class="v" id="kpiAnchor">—</div>
+            <div class="t">Âncoras no resumo</div>
           </div>
           <div class="kpi">
-            <div class="v" id="kpiWords">—</div>
-            <div class="t">Palavras extraídas</div>
+            <div class="v" id="kpiPDF">—</div>
+            <div class="t">PDF (texto extraído)</div>
           </div>
           <div class="kpi">
-            <div class="v" id="kpiConfidence">—</div>
-            <div class="t">Confiança do diagnóstico</div>
+            <div class="v" id="kpiQ">—</div>
+            <div class="t">Perguntas geradas</div>
+          </div>
+          <div class="kpi">
+            <div class="v" id="kpiConf">—</div>
+            <div class="t">Diagnóstico</div>
           </div>
         </div>
 
         <div class="hr"></div>
-
-        <div class="mono" id="docDigest">Aguardando PDF…</div>
+        <div class="small" id="digest"></div>
       </div>
     </section>
 
@@ -317,26 +440,26 @@
     <aside class="card">
       <div class="hd">
         <div>
-          <h2>2) Diagnóstico + Simulação</h2>
-          <div class="hint">Pergunta → sua resposta → repregunta chata → feedback. No final: nota estimada e relatório em PDF.</div>
+          <h2>3) Simulador de banca (fácil → difícil, aleatório)</h2>
+          <div class="hint">Pergunta → resposta → repregunta chata → feedback. No final: festa + relatório em PDF.</div>
         </div>
       </div>
-      <div class="bd">
 
+      <div class="bd">
         <div class="prof">
           <div class="avatar"></div>
           <div>
-            <div class="name">Professor(a) da Banca (modo chato)</div>
-            <div class="role" id="profRole">—</div>
-            <div class="msg" id="questionBox">Faça upload e clique em <b>Analisar PDF</b>. Se quiser testar, use o modo DEMO.</div>
-            <div id="questionTags"></div>
+            <div class="name" id="whoName">Professor(a) da banca</div>
+            <div class="role" id="whoRole">—</div>
+            <div class="msg" id="qText">Cole o resumo e clique em <b>Analisar e começar</b> (ou carregue o DEMO).</div>
+            <div class="tags" id="qTags"></div>
           </div>
         </div>
 
         <div style="height:12px"></div>
 
-        <label>Sua resposta (objetiva, sem enrolar)</label>
-        <textarea id="answer" placeholder="Responda como se estivesse na banca. Pense em: objetivo → evidência → limite → implicação."></textarea>
+        <label>Sua resposta (objetiva — sem enrolar)</label>
+        <textarea id="answer" placeholder="Estrutura que salva na banca: (1) ponto central, (2) evidência, (3) limite, (4) implicação."></textarea>
 
         <div class="btns">
           <button id="btnAnswer">Responder</button>
@@ -344,29 +467,29 @@
           <button class="secondary" id="btnIDK">Não sei responder</button>
         </div>
 
-        <div class="feedback hide" id="feedbackBox">
-          <h3>Feedback do professor chato</h3>
-          <div class="small" id="feedbackSummary">—</div>
-          <ul class="list" id="feedbackList"></ul>
+        <div class="feedback hide" id="fbBox">
+          <h3 id="fbTitle">Feedback (banca chata)</h3>
+          <div class="small" id="fbSummary">—</div>
+          <ul class="list" id="fbList"></ul>
+
           <div class="hr"></div>
-          <div class="small muted">E agora eu vou te apertar de novo (repregunta):</div>
-          <div style="margin-top:8px; font-weight:800" id="followupQ">—</div>
+          <div class="small">Repregunta:</div>
+          <div style="margin-top:8px; font-weight:900" id="followQ">—</div>
+
           <div class="btns">
             <button class="good" id="btnNext">Próxima pergunta</button>
-            <button class="secondary" id="btnFinish">Finalizar e gerar relatório</button>
+            <button class="warn" id="btnFinish">Finalizar + relatório</button>
           </div>
         </div>
 
         <div class="hr"></div>
 
-        <div class="small muted">Progresso da simulação</div>
-        <div class="scorebar" style="margin-top:8px;">
-          <div class="scorefill" id="progressFill"></div>
-        </div>
-        <div class="small" style="margin-top:8px;">
-          Perguntas respondidas: <b id="qDone">0</b> / <b id="qTotal">0</b> • Nota parcial estimada: <b id="liveGrade">—</b>
-        </div>
+        <div class="small">Progresso</div>
+        <div class="bar" style="margin-top:8px;"><div class="fill" id="progFill"></div></div>
 
+        <div class="small" style="margin-top:8px;">
+          Respondidas: <b id="done">0</b> / <b id="total">0</b> • Nota parcial: <b id="liveGrade">—</b> • Humor da banca: <b id="mood">—</b>
+        </div>
       </div>
     </aside>
 
@@ -379,41 +502,111 @@
 </div>
 
 <script>
-/* =========================
+/* ======================
    UTIL
-========================= */
-const $ = (id) => document.getElementById(id);
+====================== */
+const $ = (id)=>document.getElementById(id);
+const SESSION_KEY = "guru_banca_v2";
 
-function toast(title, body, ms=2600){
-  $("toastT").textContent = title;
-  $("toastB").textContent = body;
+function toast(t,b,ms=2600){
+  $("toastT").textContent=t;
+  $("toastB").textContent=b;
   $("toast").classList.remove("hide");
   setTimeout(()=> $("toast").classList.add("hide"), ms);
 }
-
-function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-function wordsCount(s){
-  return (s||"").trim().split(/\s+/).filter(Boolean).length;
-}
-
-function pct(n){ return Math.round(n*100) + "%"; }
-
+function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
 function nowISO(){
-  const d = new Date();
+  const d=new Date();
   return d.toISOString().slice(0,19).replace("T"," ");
 }
+function wordsCount(s){ return (s||"").trim().split(/\s+/).filter(Boolean).length; }
+function sample(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+function pct(n){ return Math.round(n*100) + "%"; }
 
-/* =========================
-   PDF EXTRACTION (PDF.js)
-========================= */
+/* ======================
+   CONFETTI (canvas)
+====================== */
+const confetti = (() => {
+  const canvas = $("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+  let W=0,H=0, parts=[], raf=null, endAt=0;
+
+  function resize(){
+    W = canvas.width = window.innerWidth * devicePixelRatio;
+    H = canvas.height = window.innerHeight * devicePixelRatio;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function burst(intensity=120, durationMs=1200){
+    const colors = ["#7c3aed","#0ea5e9","#22c55e","#f59e0b","#ef4444","#111827"];
+    const count = intensity;
+    for(let i=0;i<count;i++){
+      parts.push({
+        x: Math.random()*W,
+        y: -20,
+        vx:(Math.random()*2-1)*2*devicePixelRatio,
+        vy:(Math.random()*2+2)*devicePixelRatio,
+        r:(Math.random()*6+3)*devicePixelRatio,
+        rot: Math.random()*Math.PI,
+        vr:(Math.random()*0.2-0.1),
+        c: colors[Math.floor(Math.random()*colors.length)],
+        life: 0,
+        max: Math.random()*80+60
+      });
+    }
+    endAt = performance.now() + durationMs;
+    if(!raf) loop();
+  }
+
+  function loop(){
+    raf = requestAnimationFrame(loop);
+    ctx.clearRect(0,0,W,H);
+
+    parts.forEach(p=>{
+      p.life++;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.03*devicePixelRatio;
+      p.rot += p.vr;
+
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.c;
+      ctx.globalAlpha = 1 - (p.life/p.max);
+      ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.7);
+      ctx.restore();
+    });
+
+    parts = parts.filter(p => p.life < p.max && p.y < H+50);
+
+    if(performance.now() > endAt && parts.length === 0){
+      cancelAnimationFrame(raf);
+      raf=null;
+      ctx.clearRect(0,0,W,H);
+    }
+  }
+
+  return { burst };
+})();
+
+/* ======================
+   PDF (optional)
+====================== */
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 async function extractPdfText(file){
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-
   let full = "";
   for(let p=1; p<=pdf.numPages; p++){
     const page = await pdf.getPage(p);
@@ -424,752 +617,949 @@ async function extractPdfText(file){
   return { pages: pdf.numPages, text: full };
 }
 
-/* =========================
-   HEURISTIC PARSER
-========================= */
+/* ======================
+   ABSTRACT ANCHORS
+   (extrai pistas do resumo)
+====================== */
 function normalize(s){
-  return (s||"")
-    .replace(/\s+/g," ")
-    .replace(/[“”]/g,'"')
-    .replace(/[‘’]/g,"'")
-    .trim();
+  return (s||"").replace(/\s+/g," ").trim();
+}
+function sentenceSplit(text){
+  const t = (text||"").replace(/\n+/g," ");
+  const parts = t.split(/(?<=[\.\!\?])\s+/).map(x=>x.trim()).filter(Boolean);
+  return parts.length ? parts : [t.trim()].filter(Boolean);
+}
+function extractAnchors(abstract){
+  const a = abstract || "";
+  const low = a.toLowerCase();
+
+  // padrões comuns (PT/EN)
+  const patterns = [
+    {k:"objetivo", re: /(objetivo|objetiva|aim|objective)([^\.]{0,180})/i},
+    {k:"metodo",   re: /(metodologia|método|metodos|métodos|procedimento|an(á|a)lise|modelo|entrevista|question(á|a)rio|ensaio|experimento|amostra|survey|model|interview|questionnaire)([^\.]{0,180})/i},
+    {k:"dados",    re: /(dados|data|amostra|n\s*=\s*\d+|\b\d+\s*(participantes|amostras|anos|meses|sites|locais))([^\.]{0,180})/i},
+    {k:"resultado",re: /(resultado|resultados|achado|observou|mostrou|indicou|aumentou|reduziu|significativ|we found|results show|indicate)([^\.]{0,180})/i},
+    {k:"conclusao",re: /(conclus(ã|a)o|conclui|implica|recomenda|therefore|we conclude|suggest)([^\.]{0,180})/i},
+    {k:"limitacao",re: /(limita(ç|c)(ã|a)o|limitações|limitation|constraints)([^\.]{0,180})/i},
+    {k:"lacuna",   re: /(lacuna|gap|poucos estudos|scarce|lack of studies)([^\.]{0,180})/i},
+  ];
+
+  const anchors = [];
+  for(const p of patterns){
+    const m = a.match(p.re);
+    if(m){
+      anchors.push({ key:p.k, snippet: normalize((m[0]||"").slice(0,220)) });
+    }
+  }
+
+  // pega 2-3 frases “mais informativas”
+  const sents = sentenceSplit(a);
+  const ranked = sents
+    .map(s => ({s, score: scoreInformative(s)}))
+    .sort((x,y)=>y.score-x.score)
+    .slice(0,3)
+    .map(x=>normalize(x.s).slice(0,240));
+
+  ranked.forEach((sn,i)=>anchors.push({key:`frase_${i+1}`, snippet: sn}));
+
+  // dedup snippets
+  const seen = new Set();
+  const uniq = [];
+  for(const an of anchors){
+    const key = an.key + "::" + an.snippet.toLowerCase();
+    if(seen.has(key)) continue;
+    seen.add(key);
+    uniq.push(an);
+  }
+
+  return uniq;
 }
 
-function detectSections(text){
-  const t = text.toLowerCase();
-  const has = (re) => re.test(t);
+function scoreInformative(s){
+  const low=s.toLowerCase();
+  let score = 0;
+  if(/\b(n\s*=\s*\d+|\d+)\b/.test(low)) score += 2;
+  if(/metod|métod|modelo|entrevista|survey|exper/.test(low)) score += 2;
+  if(/resultado|observ|indic|aument|reduz|signific/.test(low)) score += 2;
+  if(/objetivo|aim|objective/.test(low)) score += 2;
+  if(/conclus|implic|recomend|suggest/.test(low)) score += 1.5;
+  return score + Math.min(2, s.length/120);
+}
 
-  const sections = {
-    intro: has(/\b(introdu(ç|c)ão|introducao)\b/),
-    obj: has(/\b(objetivo(s)?|objetivo geral|objetivos específicos|objetivos especificos)\b/),
-    prob: has(/\b(problema de pesquisa|quest(ã|a)o de pesquisa|pergunta de pesquisa)\b/),
-    hypo: has(/\b(hip(ó|o)tese(s)?|hipotese(s)?)\b/),
-    meth: has(/\b(metodologia|materiais e m(é|e)todos|m(é|e)todo(s)?|procedimentos)\b/),
-    res: has(/\b(resultados)\b/),
-    disc: has(/\b(discuss(ã|a)o)\b/),
-    conc: has(/\b(conclus(ã|a)o|considera(ç|c)(õ|o)es finais)\b/),
-    lim: has(/\b(limita(ç|c)(õ|o)es|limitações)\b/),
-    ref: has(/\b(refer(ê|e)ncias|bibliografia)\b/)
+/* ======================
+   COMMITTEE
+====================== */
+let committee = [];
+
+function profileLabel(p){
+  return {
+    method:"Metodológico(a)",
+    theory:"Teórico(a)",
+    stats:"Estatístico(a)",
+    qual:"Qualitativo(a)",
+    critical:"Crítico(a)/Implicante",
+    practical:"Prático(a)/Políticas públicas",
+    nice:"Bonzinho(a)"
+  }[p] || p;
+}
+
+function renderCommittee(){
+  const box = $("committeeList");
+  box.innerHTML = "";
+  if(!committee.length){
+    box.innerHTML = `<div class="small">Nenhum avaliador cadastrado. Crie uma banca (recomendado 3–5).</div>`;
+    return;
+  }
+  committee.forEach((m, idx)=>{
+    const profiles = (m.profiles||[]).map(p=>`<span class="chip">${profileLabel(p)}</span>`).join("");
+    box.innerHTML += `
+      <div class="member">
+        <div class="memberTop">
+          <div><b>${escapeHtml(m.name)}</b> <span class="small">(${m.roleTone})</span></div>
+          <div class="btns" style="margin:0;">
+            <button class="secondary" data-act="toggle" data-idx="${idx}" style="padding:8px 10px;border-radius:12px;">Editar perfis</button>
+            <button class="danger" data-act="del" data-idx="${idx}" style="padding:8px 10px;border-radius:12px;">Remover</button>
+          </div>
+        </div>
+        <div class="chips">${profiles}</div>
+        <div class="small" style="margin-top:8px;">
+          Perfil define o estilo das perguntas e repreguntas.
+        </div>
+      </div>
+    `;
+  });
+
+  // actions
+  box.querySelectorAll("button[data-act]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const act = btn.getAttribute("data-act");
+      const idx = Number(btn.getAttribute("data-idx"));
+      if(act === "del"){
+        committee.splice(idx,1);
+        renderCommittee();
+        saveDraft();
+        return;
+      }
+      if(act === "toggle"){
+        editProfiles(idx);
+        return;
+      }
+    });
+  });
+}
+
+function editProfiles(idx){
+  const m = committee[idx];
+  const options = [
+    ["method","Metodológico(a)"],
+    ["theory","Teórico(a)"],
+    ["stats","Estatístico(a)"],
+    ["qual","Qualitativo(a)"],
+    ["critical","Crítico(a)/Implicante"],
+    ["practical","Prático(a)/Políticas públicas"],
+    ["nice","Bonzinho(a)"]
+  ];
+  const current = new Set(m.profiles||[]);
+  const pick = options.map(([k,label]) => `${current.has(k) ? "[x]" : "[ ]"} ${label}`).join("\n");
+
+  const raw = prompt(
+`Editar perfis de: ${m.name}
+Marque perfis digitando uma lista separada por vírgula com os códigos:
+method, theory, stats, qual, critical, practical, nice
+
+Perfis atuais:
+${pick}
+
+Exemplo: method, stats, critical`,
+(m.profiles||[]).join(", ")
+  );
+
+  if(raw === null) return;
+  const tokens = raw.split(",").map(x=>x.trim()).filter(Boolean);
+  const valid = new Set(options.map(x=>x[0]));
+  const cleaned = [...new Set(tokens.filter(t=>valid.has(t)))];
+  if(!cleaned.length){
+    toast("Ops", "Você precisa manter pelo menos 1 perfil.");
+    return;
+  }
+  m.profiles = cleaned;
+  m.roleTone = roleToneFromProfiles(cleaned);
+  renderCommittee();
+  saveDraft();
+}
+
+function roleToneFromProfiles(profiles){
+  // define “tom dominante”
+  if(profiles.includes("nice")) return "leve";
+  if(profiles.includes("critical")) return "duro";
+  if(profiles.includes("stats") || profiles.includes("method")) return "técnico";
+  if(profiles.includes("theory")) return "conceitual";
+  if(profiles.includes("qual")) return "interpretativo";
+  if(profiles.includes("practical")) return "aplicado";
+  return "técnico";
+}
+
+function addMember(name, primary){
+  const n = (name||"").trim();
+  if(!n) return toast("Cadê o nome?", "Digite o nome do avaliador(a).");
+  const profiles = [primary];
+  committee.push({ name:n, profiles, roleTone: roleToneFromProfiles(profiles) });
+  $("memberName").value = "";
+  renderCommittee();
+  saveDraft();
+}
+
+/* ======================
+   QUESTION BANK (anchored)
+====================== */
+function makeQuestionBank(ctx, anchors){
+  const { level, severity, studyType, area } = ctx;
+
+  // helpers: gera perguntas com âncora
+  const A = () => sample(anchors)?.snippet || "(trecho do seu resumo)";
+  const pickAnchorByKey = (key) => {
+    const hit = anchors.find(x=>x.key===key);
+    return hit ? hit.snippet : A();
   };
 
-  // tentativa de título: primeiras linhas "fortes"
-  const firstChunk = normalize(text.slice(0, 1200));
-  const lines = firstChunk.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean);
-  let title = "";
-  for(const ln of lines.slice(0, 12)){
-    if(ln.length >= 12 && ln.length <= 180){
-      // heurística: linha com poucas pontuações e mais "maiusculas"
-      const letters = ln.replace(/[^A-Za-zÀ-ÿ]/g,"");
-      const upper = (ln.match(/[A-ZÀ-Ý]/g)||[]).length;
-      const ratio = letters.length ? upper/letters.length : 0;
-      if(ratio > 0.18 && ln.split(" ").length >= 3){
-        title = ln;
-        break;
+  // Dificuldade: easy/med/hard
+  // tags: core, method, stats, qual, theory, results, limits, ethics, practical, trap
+  const bank = [];
+
+  // CORE ancorado
+  bank.push(
+    q("core_e1", "easy", ["core","clareza"], "qualquer",
+      (m)=>`(${m.name}) Em 1 frase: qual é o problema central do seu estudo, do jeito que aparece no seu resumo?`,
+      ()=>`Qual a evidência no resumo que mostra que isso é um problema real (não só curiosidade)?`,
+      "Enrolar, dar contexto demais, não definir o problema.",
+      "Ponto central em 1 frase + 'importa porque...' em 1 frase."
+    ),
+    q("core_m1", "med", ["core","objetivos"], "qualquer",
+      (m)=>`(${m.name}) No seu resumo, o objetivo parece ser: "${pickAnchorByKey("objetivo")}". Transforme isso em 2 objetivos específicos verificáveis.`,
+      ()=>`Qual objetivo específico é o mais fraco? O que você mudaria nele?`,
+      "Objetivos genéricos ou não testáveis.",
+      "Objetivo específico tem verbo de ação + variável/objeto + critério de avaliação."
+    ),
+    q("core_h1", "hard", ["core","contribuicao","trap"], "qualquer",
+      (m)=>`(${m.name}) Seja honesto(a): qual é a contribuição original do seu trabalho? Se eu disser que isso é 'mais do mesmo', como você rebate?`,
+      ()=>`Qual trabalho da literatura você está estendendo/contrariando (sem citar 20 autores)?`,
+      "Dizer 'falta estudo' como contribuição.",
+      "Contribuição = 'o que você adiciona' + 'para quem' + 'por quê agora'."
+    )
+  );
+
+  // por tipo de estudo
+  if(studyType === "quant" || studyType === "mixed" || studyType === "applied"){
+    bank.push(
+      q("m_e1","easy",["method","coerencia"],"method",
+        (m)=>`(${m.name}) No seu resumo, você afirma: "${pickAnchorByKey("metodo")}". Por que esse delineamento é adequado para responder seu objetivo?`,
+        ()=>`Qual alternativa metodológica você considerou e por que descartou?`,
+        "Método escolhido 'porque era o que dava'.",
+        "Defenda método com: adequação → viés controlado → limite assumido."
+      ),
+      q("s_m1","med",["stats","incerteza"],"stats",
+        (m)=>`(${m.name}) Que suposições a sua análise/modelo faz? E como você verificou (ou verificaria) essas suposições?`,
+        ()=>`Se uma suposição falhar, qual conclusão cai primeiro?`,
+        "Rodar teste/modelo sem checar suposições.",
+        "Fale em diagnóstico, sensibilidade, robustez e incerteza."
+      ),
+      q("s_h1","hard",["stats","causalidade","trap"],"stats",
+        (m)=>`(${m.name}) No seu resumo você sugere efeito/associação: "${pickAnchorByKey("resultado")}". Isso é causalidade ou associação? O que falta para ser causal?`,
+        ()=>`Qual variável de confusão mais provável está escondida aí?`,
+        "Confundir correlação com causalidade.",
+        "Diga: associação → plausibilidade → confusão → desenho/experimento necessário."
+      )
+    );
+  }
+
+  if(studyType === "qual" || studyType === "mixed"){
+    bank.push(
+      q("q_e1","easy",["qual","rigor"],"qual",
+        (m)=>`(${m.name}) Em qualitativo, rigor não é 'achar bonito'. Como você garante credibilidade/consistência (triangulação, saturação, validação, auditoria)?`,
+        ()=>`Se eu disser: "isso é só opinião", qual é sua resposta técnica?`,
+        "Não definir critérios de rigor qualitativo.",
+        "Use linguagem de rigor: saturação, triangulação, rastreabilidade, reflexividade."
+      ),
+      q("q_m1","med",["qual","amostragem"],"qual",
+        (m)=>`(${m.name}) Como você definiu participantes/casos? Que tipo de amostragem (intencional, bola de neve etc.) e por quê?`,
+        ()=>`Que viés essa amostragem pode introduzir?`,
+        "Amostra por conveniência sem crítica.",
+        "Diga: critério de inclusão → saturação → limitações."
+      ),
+      q("q_h1","hard",["qual","trap","interpretacao"],"critical",
+        (m)=>`(${m.name}) Mostre que você sabe separar dado e interpretação. Me dê um exemplo (do seu trabalho) de onde você pode estar interpretando demais.`,
+        ()=>`Como você reescreveria essa parte para ficar mais defensável?`,
+        "Misturar resultado com opinião.",
+        "Estruture: evidência (fala/código) → interpretação → limite."
+      )
+    );
+  }
+
+  if(studyType === "review"){
+    bank.push(
+      q("rv_e1","easy",["method","review"],"method",
+        (m)=>`(${m.name}) Sua revisão é sistemática, escopo, ou narrativa? O que define isso metodologicamente?`,
+        ()=>`Se eu pedir reprodutibilidade, o que você mostra (strings, bases, critérios)?`,
+        "Chamar tudo de sistemática sem método.",
+        "Defina protocolo, critérios, bases, seleção e viés."
+      ),
+      q("rv_m1","med",["method","review","viés"],"method",
+        (m)=>`(${m.name}) Onde sua revisão pode estar enviesada (bases, idioma, recorte temporal, critérios)?`,
+        ()=>`Qual medida prática você tomou para reduzir esse viés?`,
+        "Ignorar viés de publicação/seleção.",
+        "Mostre transparência: critérios e limitações."
+      ),
+      q("rv_h1","hard",["review","contribuicao","trap"],"critical",
+        (m)=>`(${m.name}) Qual síntese você produziu que NÃO é só 'lista de estudos'? Qual insight novo emergiu?`,
+        ()=>`Se eu te pedir 1 figura/estrutura conceitual, qual seria?`,
+        "Revisão sem síntese.",
+        "Contribuição = mapa conceitual, lacunas, agenda de pesquisa."
+      )
+    );
+  }
+
+  if(studyType === "theory"){
+    bank.push(
+      q("th_e1","easy",["theory","conceitos"],"theory",
+        (m)=>`(${m.name}) Defina operacionalmente seus 2 conceitos centrais. Como eles aparecem no mundo real?`,
+        ()=>`Se eu mudar sua definição, o que muda na sua conclusão?`,
+        "Conceitos vagos, sem operacionalização.",
+        "Definição + implicação + fronteira do conceito."
+      ),
+      q("th_m1","med",["theory","lacuna"],"theory",
+        (m)=>`(${m.name}) Qual lacuna EXATA você preenche? Não vale 'faltam estudos'.`,
+        ()=>`Quem é o principal autor/linha que você está estendendo?`,
+        "Lacuna genérica.",
+        "Lacuna = pergunta específica não respondida + por que agora."
+      ),
+      q("th_h1","hard",["theory","trap","coerencia"],"critical",
+        (m)=>`(${m.name}) Qual é a crítica mais forte que alguém faria ao seu argumento? Faça por mim, sem dó.`,
+        ()=>`Agora se defenda: qual é o seu melhor contra-argumento?`,
+        "Ignorar objeções.",
+        "Mostre maturidade: melhor crítica + resposta consistente."
+      )
+    );
+  }
+
+  // RESULTADOS / DISCUSSÃO / LIMITES (para todos)
+  bank.push(
+    q("r_m1","med",["results","evidencia"],"critical",
+      (m)=>`(${m.name}) Qual é o seu achado mais forte? Use o resumo: "${pickAnchorByKey("resultado")}". Qual a evidência e qual a interpretação?`,
+      ()=>`Qual explicação alternativa plausível existe para esse achado?`,
+      "Só repetir resultado sem explicar evidência/alternativa.",
+      "Achado + evidência + alternativa + por que você prefere sua leitura."
+    ),
+    q("l_m1","med",["limits","honestidade"],"method",
+      (m)=>`(${m.name}) No seu resumo, qual limitação você admitiu? Se não admitiu, você já começou errado. Diga uma limitação real e seu impacto.`,
+      ()=>`Como isso muda a força da sua conclusão (forte → moderada → fraca)?`,
+      "Não assumir limitação.",
+      "Limitação real + impacto + mitigação + agenda futura."
+    ),
+    q("p_e1","easy",["practical","impacto"],"practical",
+      (m)=>`(${m.name}) Se eu for gestor/política pública: qual recomendação prática sai do seu trabalho? (sem prometer o que você não mediu)`,
+      ()=>`O que pode dar errado se aplicarem sua recomendação fora do seu contexto?`,
+      "Promessas além do dado.",
+      "Recomendação = condicional + limites + cenário de aplicação."
+    )
+  );
+
+  // ÉTICA (mais forte em banca técnica/chata)
+  if(severity !== "calm"){
+    bank.push(
+      q("e_m1","med",["ethics","risco"],"critical",
+        (m)=>`(${m.name}) Existe risco ético, viés social, impacto em grupos, privacidade, dano indireto? Onde está seu cuidado com isso?`,
+        ()=>`Se alguém questionar isso na banca, qual é sua resposta objetiva em 20 segundos?`,
+        "Ignorar ética/impacto.",
+        "Reconheça risco + mitigação + limitação."
+      )
+    );
+  }
+
+  // Pegadinhas “chatas” quando severity hard
+  if(severity === "hard"){
+    bank.push(
+      q("trap_h1","hard",["trap","coerencia"],"critical",
+        (m)=>`(${m.name}) Eu não estou convencido(a) que seu método responde ao objetivo. Prove em 2 frases usando o resumo: "${pickAnchorByKey("objetivo")}".`,
+        ()=>`Qual ajuste mínimo você faria para alinhar 100% objetivo↔método?`,
+        "Desalinhamento objetivo-método.",
+        "Mostre o encadeamento: objetivo → variável/dado → método → evidência."
+      ),
+      q("trap_h2","hard",["trap","perguntamaldita"],"critical",
+        (m)=>`(${m.name}) Qual parte do seu trabalho pode ser só ruído/artefato? Onde você pode estar se enganando?`,
+        ()=>`Qual análise/checagem extra reduziria essa dúvida?`,
+        "Confiança excessiva.",
+        "Maturidade: reconhecer dúvida + propor checagem."
+      )
+    );
+  }
+
+  // Ajuste por nível (Doutorado exige mais)
+  if(level === "phd"){
+    bank.push(
+      q("phd_h1","hard",["core","originalidade","trap"],"theory",
+        (m)=>`(${m.name}) Em doutorado, eu cobro originalidade. Qual é a tese (no sentido forte) que você defende?`,
+        ()=>`Se eu discordar da tese, qual evidência-chave você usa para me convencer?`,
+        "Doutorado sem tese forte.",
+        "Tese = afirmação ousada + base empírica + limites."
+      )
+    );
+  }
+
+  // Ajuste por área
+  if(area === "exa"){
+    bank.push(
+      q("exa_m1","med",["method","pipeline"],"method",
+        (m)=>`(${m.name}) Qual etapa do seu pipeline é mais vulnerável a erro (pré-processamento, parâmetro, validação, implementação)?`,
+        ()=>`Como você testou que não é bug/artefato?`,
+        "Não validar pipeline.",
+        "Validação cruzada, testes, verificação, rastreabilidade."
+      )
+    );
+  }
+  if(area === "bio"){
+    bank.push(
+      q("bio_m1","med",["method","controle"],"method",
+        (m)=>`(${m.name}) Quais controles (coleta/ambiente/experimental) garantem que seu efeito não é artefato?`,
+        ()=>`Qual variável ambiental não controlada pode inverter sua interpretação?`,
+        "Efeito confundido por ambiente/coleta.",
+        "Controle/mitigação + limite."
+      )
+    );
+  }
+  if(area === "hum"){
+    bank.push(
+      q("hum_m1","med",["theory","posicionamento"],"theory",
+        (m)=>`(${m.name}) Qual é seu posicionamento teórico-metodológico? Qual lente você usa para interpretar os achados?`,
+        ()=>`Qual alternativa teórica poderia explicar diferente?`,
+        "Sem posicionamento teórico.",
+        "Lente teórica explícita + implicações."
+      )
+    );
+  }
+
+  return bank;
+}
+
+function q(id, difficulty, tags, personaProfile, questionFn, followFn, commonError, goldenTip){
+  return {
+    id, difficulty, tags, personaProfile,
+    ask: questionFn, follow: followFn,
+    commonError, goldenTip
+  };
+}
+
+/* ======================
+   SELEÇÃO ALEATÓRIA INTELIGENTE
+====================== */
+function mixRatios(mix){
+  if(mix==="easy") return {easy:.50, med:.35, hard:.15};
+  if(mix==="hard") return {easy:.20, med:.35, hard:.45};
+  if(mix==="random") return {easy:.34, med:.33, hard:.33}; // será random de verdade depois
+  return {easy:.30, med:.40, hard:.30};
+}
+
+function buildQuestions(ctx, anchors){
+  const bank = makeQuestionBank(ctx, anchors);
+
+  // se não tem banca cadastrada, cria padrão
+  if(!committee.length){
+    committee = [
+      {name:"Avaliador(a) 1", profiles:["method","stats"], roleTone:"técnico"},
+      {name:"Avaliador(a) 2", profiles:["theory","critical"], roleTone:"duro"},
+      {name:"Avaliador(a) 3", profiles:["practical"], roleTone:"aplicado"},
+    ];
+    renderCommittee();
+  }
+
+  // quantas
+  const n = clamp(Number(ctx.nQuestions)||24, 8, 60);
+
+  // embaralhar banco e escolher por dificuldade com quotas
+  const ratios = mixRatios(ctx.difficultyMix);
+  let nEasy = Math.round(n*ratios.easy);
+  let nMed  = Math.round(n*ratios.med);
+  let nHard = n - nEasy - nMed;
+
+  if(ctx.difficultyMix==="random"){
+    // aleatório total: sorteia dificuldades
+    nEasy = nMed = nHard = 0;
+  }
+
+  const byDiff = {
+    easy: shuffle(bank.filter(x=>x.difficulty==="easy").slice()),
+    med:  shuffle(bank.filter(x=>x.difficulty==="med").slice()),
+    hard: shuffle(bank.filter(x=>x.difficulty==="hard").slice()),
+  };
+
+  const selected = [];
+
+  function pickFrom(diff, count){
+    for(let i=0;i<count;i++){
+      if(byDiff[diff].length) selected.push(byDiff[diff].pop());
+      else {
+        // fallback: pega de qualquer
+        const any = shuffle(bank.slice());
+        selected.push(any.pop());
       }
     }
   }
 
-  // objetivo/problema (extrair trecho com regex simples)
-  const pick = (re) => {
-    const m = text.match(re);
-    if(!m) return "";
-    return normalize(m[1] || m[0]).slice(0, 420);
-  };
-
-  const objective = pick(/objetivo(?: geral)?[:\-–]\s*([\s\S]{30,500}?)(?:\n|\r|\. {1,2}|objetivos específicos|objetivos especificos|metodologia|materiais e métodos)/i);
-  const problem = pick(/(problema de pesquisa|quest(ã|a)o de pesquisa|pergunta de pesquisa)[:\-–]\s*([\s\S]{30,500}?)(?:\n|\r|hip(ó|o)tese|objetivo|metodologia)/i);
-
-  // confiança
-  const hitCount = Object.values(sections).filter(Boolean).length;
-  const confidence =
-    hitCount >= 6 ? "alta" :
-    hitCount >= 3 ? "média" : "baixa";
-
-  return { title, sections, objective, problem, confidence };
-}
-
-/* =========================
-   QUESTION ENGINE
-========================= */
-function buildQuestionBank(ctx){
-  const { level, area, severity, meta } = ctx;
-
-  // tags: ["metodo","teoria","resultado","limite","originalidade","aplicacao","dados","estatistica","etica"]
-  const base = [
-    { id:"core_01", tags:["core","clareza"], text:"Em uma frase: qual é o seu problema de pesquisa? E não me dê contexto: me dê o problema.", follow:"Você consegue mostrar onde isso aparece no texto? Em que página/trecho?"},
-    { id:"core_02", tags:["core","relevancia"], text:"Por que isso importa? Me dê 1 razão científica e 1 razão prática (social, política pública, gestão, tecnologia).", follow:"Se eu discordar, qual evidência você tem para sustentar essa relevância?"},
-    { id:"core_03", tags:["core","objetivos"], text:"Quais são seus objetivos (geral e específicos) e como cada específico vira uma análise/etapa concreta?", follow:"Qual objetivo ficou mais fraco e por quê?"},
-    { id:"core_04", tags:["core","contribuicao"], text:"Qual é sua contribuição original? O que muda no mundo acadêmico depois do seu trabalho?", follow:"Se eu disser que isso já existe na literatura, como você me convence do contrário?"},
-    { id:"core_05", tags:["core","limites"], text:"Qual é a limitação mais grave do seu estudo? A mais perigosa mesmo.", follow:"Se essa limitação for real, o que cai primeiro: método, resultado ou conclusão?"}
-  ];
-
-  const meth = [
-    { id:"m_01", tags:["metodo","coerencia"], text:"Por que você escolheu esse método/delineamento e não outro mais simples ou mais robusto?", follow:"Qual alternativa você considerou e por que descartou?"},
-    { id:"m_02", tags:["metodo","amostra"], text:"Sua amostra (ou corpus/dados) é suficiente e representativa? Defina 'suficiente' com critério.", follow:"Se eu reduzir sua amostra pela metade, suas conclusões ainda ficam em pé?"},
-    { id:"m_03", tags:["metodo","viés"], text:"Quais são os principais vieses do seu desenho e o que você fez para mitigá-los?", follow:"Qual viés você não conseguiu controlar e como isso pode distorcer seu resultado?"},
-    { id:"m_04", tags:["metodo","replicabilidade"], text:"Se eu quiser reproduzir seu estudo amanhã, o que eu preciso saber que NÃO está explícito no seu texto?", follow:"Qual detalhe, se faltar, torna seu estudo irreprodutível?"},
-  ];
-
-  const stats = [
-    { id:"s_01", tags:["estatistica","dados"], text:"Você está inferindo ou só descrevendo? Onde entra a incerteza: intervalo, erro, robustez, sensibilidade?", follow:"Se eu pedir um teste de robustez, qual você faria primeiro?"},
-    { id:"s_02", tags:["estatistica","causalidade"], text:"Você está falando de correlação ou causalidade? Me prove que você sabe a diferença no seu caso.", follow:"Qual variável de confusão pode estar dirigindo seu efeito?"},
-    { id:"s_03", tags:["estatistica","modelo"], text:"Qual suposição do seu modelo/análise é a mais frágil? E o que acontece se ela falhar?", follow:"Como você detectaria que ela falhou, na prática?"}
-  ];
-
-  const theory = [
-    { id:"t_01", tags:["teoria","fundamentacao"], text:"Qual é o pilar teórico do seu trabalho? Se eu tirar isso, seu trabalho ainda existe?", follow:"Qual autor/linha você discorda parcialmente? E por quê?"},
-    { id:"t_02", tags:["teoria","conceitos"], text:"Defina operacionalmente os seus 2 conceitos centrais. Como você mede/observa isso no mundo real?", follow:"Se eu mudar sua definição, seu resultado muda? Em que direção?"},
-    { id:"t_03", tags:["teoria","lacuna"], text:"Qual lacuna EXATA na literatura você está preenchendo? Lacuna real, não 'faltam estudos'.", follow:"Quem é o principal trabalho que você está estendendo ou contrariando?"}
-  ];
-
-  const results = [
-    { id:"r_01", tags:["resultado","evidencia"], text:"Qual é o seu resultado mais forte? Me diga o achado e a evidência que o sustenta.", follow:"Qual explicação alternativa existe para esse achado?"},
-    { id:"r_02", tags:["resultado","discussao"], text:"Onde você pode estar super-interpretando seus dados? Aponte uma frase do seu texto que você mesmo reescreveria.", follow:"Qual seria uma versão mais cautelosa dessa frase?"},
-    { id:"r_03", tags:["resultado","generalizacao"], text:"Até onde você pode generalizar? Onde você NÃO pode generalizar de jeito nenhum?", follow:"Se alguém aplicar sua conclusão fora do seu contexto, qual erro ela cometeria?"}
-  ];
-
-  const ethics = [
-    { id:"e_01", tags:["etica","dados"], text:"Existe risco ético, viés social, privacidade, impacto em grupos? Como você tratou isso?", follow:"Se eu for duro: onde você pode ter sido ingênuo(a) eticamente?"},
-  ];
-
-  const practical = [
-    { id:"p_01", tags:["aplicacao","impacto"], text:"Se eu te der 2 minutos com um gestor/político/empresa: qual recomendação prática você faz, com base no seu trabalho?", follow:"O que pode dar errado se aplicarem sua recomendação sem cautela?"},
-    { id:"p_02", tags:["aplicacao","futuro"], text:"Qual é a agenda de pesquisa/continuidade mais óbvia após sua defesa? Seja específico.", follow:"Qual continuação seria mais 'barata' e qual seria a mais 'transformadora'?"}
-  ];
-
-  // Ajustes por área (pequenos, mas úteis)
-  if(area === "hum"){
-    practical.push({ id:"h_01", tags:["metodo","hum"], text:"Como você garante validade/credibilidade (triangulação, saturação, confiabilidade, rigor interpretativo)?", follow:"Se eu disser que é 'só opinião', como você responde?"});
-  }
-  if(area === "exa"){
-    stats.push({ id:"x_01", tags:["metodo","exa"], text:"Qual parte do seu pipeline é mais vulnerável a erro (pré-processamento, parâmetro, validação, implementação)?", follow:"Como você testou/certificou que não é bug?"});
-  }
-  if(area === "bio"){
-    meth.push({ id:"b_01", tags:["metodo","bio"], text:"Que controles (experimentais/observacionais) garantem que o efeito não é artefato do ambiente/coleta?", follow:"Qual variável ambiental não controlada pode inverter sua interpretação?"});
-  }
-
-  // Seleção guiada pela presença de seções
-  const bank = [...base];
-
-  const s = meta.sections || {};
-  const includeMeth = s.meth || severity !== "calm";
-  const includeTheory = s.intro || s.ref || severity !== "calm";
-  const includeResults = s.res || s.disc || s.conc || severity !== "calm";
-
-  if(includeMeth) bank.push(...meth, ...stats);
-  if(includeTheory) bank.push(...theory);
-  if(includeResults) bank.push(...results, ...practical);
-  if(severity !== "calm") bank.push(...ethics);
-
-  // Em “chata”, aumenta o núcleo e adiciona “pegadinhas”
-  if(severity === "hard"){
-    bank.push(
-      { id:"h_peg_01", tags:["core","pegadinha"], text:"Se eu disser que seu objetivo NÃO está alinhado ao método, onde exatamente você prova que está?", follow:"Qual parte do método você mudaria para alinhar melhor?"},
-      { id:"h_peg_02", tags:["metodo","pegadinha"], text:"Qual é a crítica mais destrutiva que alguém poderia fazer ao seu trabalho? Faça por mim.", follow:"Agora se defenda — sem ser defensivo(a)."},
-      { id:"h_peg_03", tags:["resultado","pegadinha"], text:"Qual resultado seu pode ser simplesmente ruído? Qual parte pode ser efeito de confusão?", follow:"Qual análise adicional reduziria essa dúvida?"}
-    );
-  }
-
-  // Em “tranquila”, limita a quantidade e suaviza
-  let final = bank;
-
-  // ordem: core primeiro, depois método/teoria/resultados
-  final.sort((a,b)=>{
-    const A = a.tags.includes("core") ? 0 : 1;
-    const B = b.tags.includes("core") ? 0 : 1;
-    return A - B;
-  });
-
-  // tamanho por nível
-  const n =
-    level === "tcc" ? 18 :
-    level === "msc" ? 24 : 30;
-
-  // embaralhar mantendo núcleo no topo
-  const core = final.filter(q => q.tags.includes("core"));
-  const rest = final.filter(q => !q.tags.includes("core"));
-  shuffle(rest);
-  final = [...core, ...rest].slice(0, n);
-
-  // garante followup
-  final = final.map(q => ({...q, follow: q.follow || "Ok. Mas por que eu deveria acreditar nisso?"}));
-
-  return final;
-}
-
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]] = [arr[j],arr[i]];
-  }
-}
-
-/* =========================
-   SCORING (Heurístico)
-========================= */
-function evaluateAnswer(q, answer, ctx){
-  const a = (answer||"").trim();
-  const wc = wordsCount(a);
-
-  // Heurísticas simples (mas úteis)
-  const tooShort = wc < 35;
-  const tooLong  = wc > 220;
-
-  const hasStructure = /porque|portanto|assim|logo|evid(ê|e)ncia|dados|resultado|m(é|e)todo|limita(ç|c)(ã|a)o|no meu estudo/i.test(a);
-  const hasNumbers = /\d/.test(a);
-  const hedging = /(acho|talvez|meio que|tipo|sei lá|não lembro|creio|imagino)/i.test(a);
-
-  // penalidades/bonus por severidade
-  const sev = ctx.severity;
-  let clarity = 6.5, method = 6.5, theory = 6.5, result = 6.5, limits = 6.5, confidence = 6.5;
-
-  // Clareza
-  if(tooShort) clarity -= 2.2;
-  if(tooLong) clarity -= 1.2;
-  if(hasStructure) clarity += 1.2;
-  if(hedging) clarity -= 1.2;
-
-  // Método
-  if(q.tags.includes("metodo") || q.tags.includes("estatistica")){
-    if(hasStructure) method += 1.0;
-    if(hasNumbers) method += 0.8;
-    if(tooShort) method -= 1.8;
-    if(hedging) method -= 1.0;
-  }
-
-  // Teoria
-  if(q.tags.includes("teoria")){
-    if(/autor|literatura|teoria|conceito|refer(ê|e)ncia/i.test(a)) theory += 1.1;
-    if(tooShort) theory -= 1.6;
-    if(hedging) theory -= 0.8;
-  }
-
-  // Resultado/Discussão
-  if(q.tags.includes("resultado") || q.tags.includes("aplicacao")){
-    if(/encontrei|observ(ei|amos)|mostrou|indicou|aumentou|reduziu|associ/i.test(a)) result += 1.0;
-    if(/alternativa|confus|incertez|interval|robust|sensibil/i.test(a)) result += 1.0;
-    if(tooShort) result -= 1.8;
-  }
-
-  // Limitações
-  if(q.tags.includes("limite") || /limita/i.test(q.text)){
-    if(/limita|vi(e|é)s|restri(ç|c)(ã|a)o|amostra|generaliza/i.test(a)) limits += 1.2;
-    if(/mas|por(é|e)m|contudo/i.test(a)) limits += 0.5;
-    if(tooShort) limits -= 1.5;
-  }
-
-  // Segurança
-  confidence += (hasStructure ? 0.9 : -0.6);
-  confidence += (hedging ? -1.6 : 0.3);
-  confidence += (tooShort ? -1.0 : 0.4);
-
-  // Bancas mais chatas punem mais enrolação e “não sei”
-  if(sev === "hard"){
-    if(tooLong) confidence -= 0.8;
-    if(hedging) confidence -= 0.8;
-  }
-
-  // Clamp 0-10
-  const dims = {
-    clarity: clamp(clarity,0,10),
-    theory: clamp(theory,0,10),
-    method: clamp(method,0,10),
-    result: clamp(result,0,10),
-    limits: clamp(limits,0,10),
-    confidence: clamp(confidence,0,10),
-  };
-
-  // comentários “chatos”
-  const hits = [];
-  if(tooShort) hits.push("Muito curto. Em banca, isso soa como insegurança ou falta de domínio.");
-  if(tooLong) hits.push("Longo demais. Você está se defendendo em vez de responder.");
-  if(hedging) hits.push("Cuidado com 'acho', 'talvez', 'tipo'. Banca chata marca isso como fragilidade.");
-  if(!hasStructure) hits.push("Faltou estrutura: objetivo → evidência → limite → implicação.");
-
-  // sugestões “frases prontas”
-  const tips = [];
-  if(!hasStructure) tips.push("Use a estrutura: **(1)** ponto central, **(2)** evidência/dado, **(3)** limitação, **(4)** implicação.");
-  if(q.tags.includes("estatistica") && !hasNumbers) tips.push("Quando der, cite pelo menos **um número** (n, período, efeito, erro, intervalo).");
-  if(q.tags.includes("limite") && !/limita|vi(e|é)s|restri/i.test(a)) tips.push("Assuma uma limitação real e diga como você mitigou ou como isso entra em trabalhos futuros.");
-
-  return { dims, hits, tips, wc };
-}
-
-/* =========================
-   REPORT / GRADE
-========================= */
-function computeGrade(session){
-  const { level } = session.ctx;
-
-  // médias
-  const avg = (k) => {
-    const arr = session.answers.map(x => x.score?.dims?.[k]).filter(v => typeof v === "number");
-    if(!arr.length) return 0;
-    return arr.reduce((a,b)=>a+b,0)/arr.length;
-  };
-
-  const clarity = avg("clarity");
-  const theory  = avg("theory");
-  const method  = avg("method");
-  const result  = avg("result");
-  const limits  = avg("limits");
-  const conf    = avg("confidence");
-
-  // pesos por nível
-  let w;
-  if(level === "tcc"){
-    w = { clarity:.20, theory:.14, method:.22, result:.16, limits:.14, confidence:.14 };
-  } else if(level === "msc"){
-    w = { clarity:.16, theory:.18, method:.20, result:.18, limits:.14, confidence:.14 };
-  } else { // phd
-    w = { clarity:.14, theory:.20, method:.22, result:.18, limits:.12, confidence:.14 };
-  }
-
-  const final = clarity*w.clarity + theory*w.theory + method*w.method + result*w.result + limits*w.limits + conf*w.confidence;
-
-  return {
-    dims: { clarity, theory, method, result, limits, confidence: conf },
-    final: clamp(final,0,10)
-  };
-}
-
-function topRisks(session){
-  // conta recorrências de problemas
-  const issues = [];
-  for(const a of session.answers){
-    for(const h of (a.score?.hits||[])){
-      issues.push(h);
+  if(ctx.difficultyMix==="random"){
+    const diffs=["easy","med","hard"];
+    const shuffledBank = shuffle(bank.slice());
+    while(selected.length < n && shuffledBank.length){
+      selected.push(shuffledBank.pop());
     }
+  } else {
+    pickFrom("easy", nEasy);
+    pickFrom("med", nMed);
+    pickFrom("hard", nHard);
   }
-  const freq = {};
-  issues.forEach(x => freq[x] = (freq[x]||0)+1);
 
-  const ranked = Object.entries(freq).sort((a,b)=>b[1]-a[1]);
-  return ranked.slice(0,5).map(([txt,n])=>({txt,n}));
-}
+  // embaralhar ordem final (mistura fácil/média/difícil)
+  shuffle(selected);
 
-function likelyQuestions(session){
-  // retorna 10 perguntas "mais prováveis" = core + tags críticas + as que o aluno foi pior
-  const answers = session.answers.slice();
-  answers.sort((a,b)=>{
-    const sa = avgScore(a.score), sb = avgScore(b.score);
-    return sa - sb; // pior primeiro
+  // atribuir “avaliador” por perfil
+  const questions = selected.map(item=>{
+    const member = pickMemberForQuestion(item);
+    return materializeQuestion(item, member, anchors);
   });
-  const worst = answers.slice(0,6).map(x => x.q);
 
-  const core = session.questions.filter(q => q.tags.includes("core")).slice(0,6);
-  const set = new Map();
-  [...core, ...worst].forEach(q => set.set(q.id, q));
-  return Array.from(set.values()).slice(0,10);
+  return questions;
 }
 
-function avgScore(score){
-  if(!score?.dims) return 0;
-  const v = Object.values(score.dims);
-  return v.reduce((a,b)=>a+b,0)/v.length;
+function pickMemberForQuestion(item){
+  // tenta pegar alguém cujo perfil casa com a pergunta
+  const desired = item.personaProfile;
+  const candidates = committee.filter(m => (m.profiles||[]).includes(desired));
+  if(candidates.length) return sample(candidates);
+
+  // fallback: se pergunta é stats, tenta alguém com stats
+  if(item.tags.includes("stats")){
+    const c2 = committee.filter(m => (m.profiles||[]).includes("stats"));
+    if(c2.length) return sample(c2);
+  }
+  if(item.tags.includes("qual")){
+    const c3 = committee.filter(m => (m.profiles||[]).includes("qual"));
+    if(c3.length) return sample(c3);
+  }
+  if(item.tags.includes("method")){
+    const c4 = committee.filter(m => (m.profiles||[]).includes("method"));
+    if(c4.length) return sample(c4);
+  }
+  if(item.tags.includes("theory")){
+    const c5 = committee.filter(m => (m.profiles||[]).includes("theory"));
+    if(c5.length) return sample(c5);
+  }
+  if(item.tags.includes("practical")){
+    const c6 = committee.filter(m => (m.profiles||[]).includes("practical"));
+    if(c6.length) return sample(c6);
+  }
+
+  // senão, qualquer
+  return sample(committee);
 }
 
-/* =========================
-   SESSION STATE
-========================= */
-const SESSION_KEY = "guru_de_banca_session_v1";
+function materializeQuestion(item, member, anchors){
+  const text = item.ask(member);
+  const follow = item.follow(member);
 
-let session = null;
-
-function makeEmptySession(ctx, meta){
+  // pega uma “âncora” boa para exibir (se tiver)
+  const anchor = sample(anchors)?.snippet || "";
   return {
-    version: 1,
-    createdAt: nowISO(),
-    ctx,
-    meta,
-    questions: [],
-    qi: 0,
-    answers: [],
+    id: item.id,
+    difficulty: item.difficulty,
+    tags: item.tags,
+    member,
+    text,
+    follow,
+    commonError: item.commonError,
+    goldenTip: item.goldenTip,
+    anchor
   };
 }
+
+/* ======================
+   SCORING (não por palavras)
+   Heurística por critérios
+====================== */
+function evaluateAnswer(q, ans, ctx){
+  const a = (ans||"").trim();
+  const low = a.toLowerCase();
+
+  // critérios (0-10)
+  let clarity = 6.0;
+  let evidence = 6.0;
+  let method = 6.0;
+  let limits = 6.0;
+  let coherence = 6.0;
+  let confidence = 6.0;
+
+  // penaliza enrolação e muletas
+  const hedging = /(acho|talvez|tipo|meio que|sei lá|não lembro|creio|imagino|né\?)/i.test(a);
+  if(hedging){ clarity -= 1.0; confidence -= 1.3; }
+
+  // estrutura mínima: ponto + porque/portanto + limite
+  const hasPoint = a.length >= 30;
+  const hasBecause = /(porque|pois|portanto|logo|assim)/i.test(a);
+  const hasLimit = /(limita|vi(e|é)s|restri|incertez|não foi possível|escopo|generaliza)/i.test(a);
+
+  if(!hasPoint) clarity -= 2.0;
+  if(hasBecause) clarity += 0.8;
+  if(hasLimit) limits += 1.2;
+
+  // evidência: números, dados, termos de resultado
+  const hasNumbers = /\b\d+(\.\d+)?\b/.test(a);
+  const hasDataWords = /(dados|amostra|n\s*=\s*\d+|entrevista|question(á|a)rio|modelo|teste|an(á|a)lise|observ|med|mensur)/i.test(a);
+  const hasResultVerbs = /(mostr|indic|aument|reduz|associ|correl|efeito|signific)/i.test(a);
+
+  if(hasNumbers) evidence += 1.1;
+  if(hasDataWords) evidence += 0.9;
+  if(hasResultVerbs) evidence += 0.7;
+
+  // método: só cobra mais se pergunta tem tags method/stats/qual/review
+  if(q.tags.includes("method") || q.tags.includes("stats") || q.tags.includes("qual") || q.tags.includes("review")){
+    if(hasDataWords) method += 1.0;
+    if(/supon|assun|normal|res(í|i)du|robust|sensibil|valida/i.test(a)) method += 1.0;
+    if(a.length < 40) method -= 1.2;
+  }
+
+  // coerência: tenta ver se a resposta repete parte da âncora/resumo
+  // (bem simples: compartilha palavras-chave)
+  if(q.anchor){
+    const kw = keywords(q.anchor, 10);
+    const hits = kw.filter(w => low.includes(w)).length;
+    coherence += Math.min(1.4, hits * 0.18);
+  }
+
+  // confiança vs agressividade da banca
+  if(ctx.severity === "hard"){
+    if(a.length > 380) clarity -= 0.8;  // enrolação
+    if(a.length < 45) confidence -= 0.8;
+  } else {
+    if(a.length < 35) confidence -= 0.6;
+  }
+
+  // clamp
+  clarity = clamp(clarity,0,10);
+  evidence = clamp(evidence,0,10);
+  method = clamp(method,0,10);
+  limits = clamp(limits,0,10);
+  coherence = clamp(coherence,0,10);
+  confidence = clamp(confidence,0,10);
+
+  // pesos dependem do tipo de pergunta
+  let w = {clarity:.22,evidence:.20,method:.20,limits:.14,coherence:.14,confidence:.10};
+  if(q.tags.includes("stats")) w = {clarity:.18,evidence:.22,method:.26,limits:.14,coherence:.10,confidence:.10};
+  if(q.tags.includes("qual"))  w = {clarity:.20,evidence:.18,method:.22,limits:.16,coherence:.14,confidence:.10};
+  if(q.tags.includes("core"))  w = {clarity:.30,evidence:.14,method:.14,limits:.12,coherence:.18,confidence:.12};
+
+  const final = clarity*w.clarity + evidence*w.evidence + method*w.method + limits*w.limits + coherence*w.coherence + confidence*w.confidence;
+
+  // feedback
+  const issues = [];
+  const tips = [];
+
+  if(!hasBecause) issues.push("Você não justificou. Em banca, afirmação sem 'por quê' vira alvo.");
+  if(!hasLimit && (q.tags.includes("stats")||q.tags.includes("method")||q.tags.includes("results")||q.tags.includes("core"))) issues.push("Faltou limitação/escopo. Banca chata cobra maturidade.");
+  if(!hasDataWords && (q.tags.includes("method")||q.tags.includes("stats"))) issues.push("Você falou de método sem mostrar como operacionalizou (dados, instrumentos, critérios).");
+  if(hedging) issues.push("Você usou muletas ('acho', 'talvez', 'tipo'). Corte isso. Parece insegurança.");
+  if(final < 6.5) tips.push("Estrutura vencedora: **ponto** → **evidência** → **limite** → **implicação**.");
+  if(!hasNumbers && (q.tags.includes("stats")||q.tags.includes("method"))) tips.push("Se puder, cite um número (n, período, efeito, critério). Banca respeita concretude.");
+  if(coherence < 6.2) tips.push("Ancore sua resposta no seu resumo: repita palavras-chave do objetivo/método/resultado.");
+
+  // “mood”
+  const mood =
+    final >= 8.3 ? "🔥 banca impressionada" :
+    final >= 7.0 ? "😄 banca ok" :
+    final >= 6.0 ? "😐 banca desconfiada" :
+                   "😬 banca afiando a faca";
+
+  return { dims:{clarity,evidence,method,limits,coherence,confidence}, final, issues, tips, mood };
+}
+
+function keywords(text, max=10){
+  const stop = new Set(["de","da","do","das","dos","a","o","e","em","para","por","com","que","uma","um","no","na","nos","nas","the","of","and","to","in","for","on","with","is","are"]);
+  const tokens = (text||"").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu," ").split(/\s+/).filter(Boolean);
+  const freq = {};
+  for(const t of tokens){
+    if(t.length < 4) continue;
+    if(stop.has(t)) continue;
+    freq[t]=(freq[t]||0)+1;
+  }
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,max).map(x=>x[0]);
+}
+
+/* ======================
+   GRADE + REPORT
+====================== */
+function computeGrade(session){
+  const arr = session.answers.map(x=>x.score?.final).filter(v=>typeof v==="number");
+  const avg = arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+
+  // leve penalidade por muitos “não sei”
+  const idk = session.answers.filter(x=>x.isIDK).length;
+  let final = avg - idk*0.15;
+
+  // pesos por nível (ajuste leve)
+  if(session.ctx.level==="phd") final -= 0.2;
+
+  final = clamp(final,0,10);
+  const status =
+    final >= 8.3 ? "PASSA COM LOUVOR" :
+    final >= 7.0 ? "PASSA BEM" :
+    final >= 6.0 ? "PASSA NO SUFOCO" :
+                   "RISCO (TREINAR MAIS)";
+
+  return { final, status };
+}
+
+function topIssues(session){
+  const freq = {};
+  for(const a of session.answers){
+    (a.score?.issues||[]).forEach(i=>freq[i]=(freq[i]||0)+1);
+  }
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([txt,n])=>({txt,n}));
+}
+
+function byMemberSummary(session){
+  const map = {};
+  for(const a of session.answers){
+    const name = a.q.member.name;
+    map[name] = map[name] || {count:0, avg:0};
+    map[name].count++;
+    map[name].avg += a.score.final;
+  }
+  Object.values(map).forEach(x=>x.avg = x.count ? x.avg/x.count : 0);
+  return map;
+}
+
+/* ======================
+   SESSION
+====================== */
+let session = null;
 
 function saveSession(){
   if(!session) return;
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem(SESSION_KEY, JSON.stringify({session, committee, draft: readDraft()}));
 }
-
 function loadSession(){
   const raw = localStorage.getItem(SESSION_KEY);
   if(!raw) return null;
   try{ return JSON.parse(raw); } catch(e){ return null; }
 }
-
-function resetSession(){
+function resetAll(){
   localStorage.removeItem(SESSION_KEY);
-  session = null;
+  session=null;
+  committee=[];
+  renderCommittee();
   renderIdle();
-  toast("Resetado", "Sessão apagada. Agora faça upload do PDF novamente.");
+  toast("Resetado", "Tudo limpo. Cole o resumo e crie sua banca.");
 }
 
-/* =========================
+/* ======================
+   DRAFT (para não perder config)
+====================== */
+function readDraft(){
+  return {
+    studentName: $("studentName").value,
+    level: $("level").value,
+    area: $("area").value,
+    studyType: $("studyType").value,
+    severity: $("severity").value,
+    abstractText: $("abstractText").value,
+    nQuestions: $("nQuestions").value,
+    difficultyMix: $("difficultyMix").value,
+  };
+}
+function applyDraft(d){
+  if(!d) return;
+  $("studentName").value = d.studentName || "";
+  $("level").value = d.level || "tcc";
+  $("area").value = d.area || "bio";
+  $("studyType").value = d.studyType || "quant";
+  $("severity").value = d.severity || "hard";
+  $("abstractText").value = d.abstractText || "";
+  $("nQuestions").value = d.nQuestions || 24;
+  $("difficultyMix").value = d.difficultyMix || "balanced";
+}
+function saveDraft(){
+  const raw = localStorage.getItem(SESSION_KEY);
+  const existing = raw ? JSON.parse(raw) : {};
+  localStorage.setItem(SESSION_KEY, JSON.stringify({...(existing||{}), draft: readDraft(), committee}));
+}
+
+/* ======================
    RENDER
-========================= */
+====================== */
 function setModePill(){
-  if(!session){ $("modePill").textContent = "—"; return; }
-  const lvl = {tcc:"TCC",msc:"Mestrado",phd:"Doutorado"}[session.ctx.level];
-  const sev = {calm:"Tranquila",tech:"Técnica",hard:"Chata"}[session.ctx.severity];
-  $("modePill").textContent = `${lvl} • ${sev}`;
+  const lvl = {tcc:"TCC",msc:"Mestrado",phd:"Doutorado"}[$("level").value];
+  const sev = {calm:"Tranquila",tech:"Técnica",hard:"Chata"}[$("severity").value];
+  const st  = {quant:"Quant",qual:"Quali",mixed:"Misto",theory:"Teórico",applied:"Aplicado",review:"Revisão"}[$("studyType").value];
+  $("modePill").textContent = `${lvl} • ${st} • ${sev}`;
 }
 
 function renderIdle(){
-  $("kpiPages").textContent = "—";
-  $("kpiWords").textContent = "—";
-  $("kpiConfidence").textContent = "—";
-  $("docDigest").textContent = "Aguardando PDF…";
-  $("profRole").textContent = "—";
-  $("questionBox").innerHTML = 'Faça upload e clique em <b>Analisar PDF</b>. Se quiser testar, use o modo DEMO.';
-  $("questionTags").innerHTML = "";
-  $("feedbackBox").classList.add("hide");
-  $("answer").value = "";
-  $("qDone").textContent = "0";
-  $("qTotal").textContent = "0";
-  $("liveGrade").textContent = "—";
-  $("progressFill").style.width = "0%";
   setModePill();
-}
-
-function renderMeta(meta, pages, words){
-  $("kpiPages").textContent = pages ?? "—";
-  $("kpiWords").textContent = words ?? "—";
-  $("kpiConfidence").textContent = meta?.confidence ? meta.confidence.toUpperCase() : "—";
-
-  const s = meta.sections || {};
-  const title = meta.title ? `Título (aprox): "${meta.title}"` : "Título: (não detectado com confiança)";
-  const obj = meta.objective ? `Objetivo (trecho): ${meta.objective}` : "Objetivo: (não detectado)";
-  const prob = meta.problem ? `Problema (trecho): ${meta.problem}` : "Problema: (não detectado)";
-
-  const flags = Object.entries(s).filter(([k,v])=>v).map(([k])=>k.toUpperCase());
-  $("docDigest").textContent =
-    `${title}\n${obj}\n${prob}\nSeções detectadas: ${flags.length ? flags.join(", ") : "poucas/nenhuma"}\nDica: se a confiança estiver baixa, seu PDF pode estar sem cabeçalhos claros.`;
+  $("kpiAnchor").textContent = "—";
+  $("kpiPDF").textContent = "—";
+  $("kpiQ").textContent = "—";
+  $("kpiConf").textContent = "—";
+  $("digest").textContent = "";
+  $("whoName").textContent = "Professor(a) da banca";
+  $("whoRole").textContent = "—";
+  $("qText").innerHTML = `Cole o resumo e clique em <b>Analisar e começar</b> (ou carregue o DEMO).`;
+  $("qTags").innerHTML = "";
+  $("fbBox").classList.add("hide");
+  $("answer").value = "";
+  $("done").textContent = "0";
+  $("total").textContent = "0";
+  $("liveGrade").textContent = "—";
+  $("mood").textContent = "—";
+  $("progFill").style.width = "0%";
 }
 
 function renderQuestion(){
   setModePill();
   const q = session.questions[session.qi];
   if(!q){
-    $("questionBox").innerHTML = "Sem mais perguntas. Gere o relatório final.";
-    $("questionTags").innerHTML = "";
-    $("qTotal").textContent = String(session.questions.length);
+    $("qText").textContent = "Fim das perguntas. Gere o relatório final.";
+    $("qTags").innerHTML = "";
     return;
   }
 
-  // “personas” mínimas por tag
-  let role = "Eu já participei de mais de 100 bancas. Responda com precisão.";
-  if(q.tags.includes("metodo")) role = "Metodologia: vou caçar incoerência e viés.";
-  if(q.tags.includes("teoria")) role = "Teoria: vou testar sua fundamentação e conceito.";
-  if(q.tags.includes("resultado")) role = "Resultados: vou apertar robustez e interpretação.";
-  if(q.tags.includes("estatistica")) role = "Estatística: vou perguntar suposições e incerteza.";
-  if(q.tags.includes("core")) role = "Básico: se você erra isso, a banca te desmonta.";
+  $("whoName").textContent = q.member.name;
+  const tone = q.member.roleTone || "técnico";
+  $("whoRole").textContent = `${tone} • ${q.member.profiles.map(profileLabel).join(", ")}`;
 
-  $("profRole").textContent = role;
-  $("questionBox").textContent = q.text;
+  // pergunta + âncora curta
+  const anchor = q.anchor ? `\n\n🎯 Trecho gatilho: “${q.anchor}”` : "";
+  $("qText").textContent = `${q.text}${anchor}`;
 
-  $("questionTags").innerHTML =
-    q.tags.map(t => `<span class="tag">${t}</span>`).join("");
+  $("qTags").innerHTML = `
+    <span class="tag">${q.difficulty.toUpperCase()}</span>
+    ${q.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
+  `;
 
-  $("answer").value = "";
-  $("feedbackBox").classList.add("hide");
+  $("answer").value="";
+  $("fbBox").classList.add("hide");
 
   const done = session.answers.length;
   const total = session.questions.length;
-  $("qDone").textContent = String(done);
-  $("qTotal").textContent = String(total);
-
-  const g = computeGrade(session).final;
-  $("liveGrade").textContent = g ? g.toFixed(1) : "—";
-
-  $("progressFill").style.width = total ? pct(done/total) : "0%";
-}
-
-function renderFeedback(score, followup){
-  $("feedbackBox").classList.remove("hide");
-
-  const dims = score.dims;
-  const avg = avgScore(score);
-
-  const mood =
-    avg >= 8.2 ? {c:"good", t:"Boa. Não me decepcionou (ainda)."} :
-    avg >= 6.6 ? {c:"warn", t:"Dá pra passar, mas tem vulnerabilidade."} :
-                 {c:"bad",  t:"Perigoso. Em banca chata, isso sangra nota."};
-
-  $("feedbackSummary").innerHTML =
-    `<b style="color:var(--${mood.c})">${mood.t}</b> • ` +
-    `Clareza ${dims.clarity.toFixed(1)} | Teoria ${dims.theory.toFixed(1)} | Método ${dims.method.toFixed(1)} | Resultados ${dims.result.toFixed(1)} | Limites ${dims.limits.toFixed(1)} | Segurança ${dims.confidence.toFixed(1)} ` +
-    `<span class="muted">• ${score.wc} palavras</span>`;
-
-  const li = [];
-  (score.hits||[]).forEach(x => li.push(`❌ ${x}`));
-  (score.tips||[]).forEach(x => li.push(`🔧 ${x}`));
-  if(!li.length) li.push("✅ Resposta ok. Agora sustente isso com consistência e evidência.");
-
-  $("feedbackList").innerHTML = li.map(x => `<li>${x}</li>`).join("");
-  $("followupQ").textContent = followup;
-}
-
-/* =========================
-   REPORT PDF
-========================= */
-async function generatePdfReport(session){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:"pt", format:"a4" });
-
-  const name = (session.ctx.studentName || "Aluno(a)").trim();
-  const levelLabel = {tcc:"TCC",msc:"Mestrado",phd:"Doutorado"}[session.ctx.level];
-  const sevLabel = {calm:"Tranquila",tech:"Técnica",hard:"Chata"}[session.ctx.severity];
-  const areaLabel = {bio:"Biológicas/Ambientais",exa:"Exatas/Tecnologia",hum:"Humanas/Sociais",int:"Interdisciplinar"}[session.ctx.area];
+  $("done").textContent = String(done);
+  $("total").textContent = String(total);
+  $("progFill").style.width = total ? pct(done/total) : "0%";
 
   const g = computeGrade(session);
-  const risks = topRisks(session);
-  const qLikely = likelyQuestions(session);
-
-  const meta = session.meta || {};
-  const title = meta.title || "(título não detectado)";
-  const conf = (meta.confidence || "baixa").toUpperCase();
-
-  let y = 52;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text("GURU DE BANCA — Relatório de Preparação", 40, y); y += 18;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
-  doc.text(`Gerado em: ${nowISO()}`, 40, y); y += 14;
-
-  doc.setFont("helvetica", "bold");
-  doc.text(`Aluno(a): `, 40, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(name, 98, y); y += 14;
-
-  doc.setFont("helvetica", "bold");
-  doc.text(`Nível: `, 40, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${levelLabel} • Área: ${areaLabel} • Banca: ${sevLabel}`, 84, y); y += 16;
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Trabalho (diagnóstico do PDF)", 40, y); y += 14;
-  doc.setFont("helvetica", "normal");
-  doc.text(`Título: ${title}`, 40, y, { maxWidth: 520 }); y += 14;
-  doc.text(`Confiança do diagnóstico: ${conf}`, 40, y); y += 14;
-
-  if(meta.objective){
-    doc.text(`Objetivo (trecho): ${meta.objective}`, 40, y, { maxWidth: 520 }); y += 28;
-  } else {
-    doc.text("Objetivo: não detectado automaticamente. Sugestão: deixe claro no texto com cabeçalho 'Objetivo'.", 40, y, { maxWidth: 520 }); y += 28;
-  }
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Nota estimada da banca", 40, y); y += 14;
-
-  doc.setFont("helvetica", "normal");
-  doc.text(`Nota final estimada: ${g.final.toFixed(1)} / 10`, 40, y); y += 14;
-  doc.text(`Clareza: ${g.dims.clarity.toFixed(1)} | Teoria: ${g.dims.theory.toFixed(1)} | Método: ${g.dims.method.toFixed(1)}`, 40, y); y += 14;
-  doc.text(`Resultados: ${g.dims.result.toFixed(1)} | Limitações: ${g.dims.limits.toFixed(1)} | Segurança: ${g.dims.confidence.toFixed(1)}`, 40, y); y += 18;
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Riscos críticos (o que pode derrubar sua nota)", 40, y); y += 14;
-  doc.setFont("helvetica", "normal");
-  if(!risks.length){
-    doc.text("Sem riscos frequentes detectados (poucas respostas ou respostas consistentes).", 40, y); y += 14;
-  } else {
-    for(const r of risks){
-      doc.text(`• (${r.n}x) ${r.txt}`, 40, y, { maxWidth: 520 }); y += 14;
-      if(y > 760){ doc.addPage(); y = 52; }
-    }
-  }
-
-  y += 8;
-  doc.setFont("helvetica", "bold");
-  doc.text("Perguntas mais prováveis na banca (treine MUITO)", 40, y); y += 14;
-  doc.setFont("helvetica", "normal");
-
-  qLikely.forEach((q, i) => {
-    doc.text(`${i+1}. ${q.text}`, 40, y, { maxWidth: 520 }); y += 22;
-    if(y > 760){ doc.addPage(); y = 52; }
-  });
-
-  y += 6;
-  doc.setFont("helvetica", "bold");
-  doc.text("Estratégias de sobrevivência (frases de escape)", 40, y); y += 14;
-
-  doc.setFont("helvetica", "normal");
-  const escapes = [
-    "• “Excelente pergunta. Esse ponto foge do escopo do estudo, mas abre uma agenda futura objetiva: ______.”",
-    "• “No meu desenho atual eu não consigo afirmar causalidade, apenas associação. Para causalidade eu precisaria de ______.”",
-    "• “A limitação principal é ______. Eu mitiguei com ______, então a conclusão deve ser lida como ______.”",
-    "• “Uma interpretação alternativa é ______. Eu favoreço minha interpretação porque ______.”"
-  ];
-  escapes.forEach(line => {
-    doc.text(line, 40, y, { maxWidth: 520 }); y += 16;
-    if(y > 760){ doc.addPage(); y = 52; }
-  });
-
-  y += 8;
-  doc.setFont("helvetica", "bold");
-  doc.text("Registro do treino (amostra)", 40, y); y += 14;
-  doc.setFont("helvetica", "normal");
-  const last = session.answers.slice(-6);
-  last.forEach((a, i) => {
-    doc.text(`Q${session.answers.length - last.length + i + 1}: ${a.q.text}`, 40, y, { maxWidth: 520 }); y += 16;
-    doc.text(`Sua resposta (resumo): ${a.answer.slice(0, 180)}${a.answer.length>180?"…":""}`, 40, y, { maxWidth: 520 }); y += 22;
-    if(y > 760){ doc.addPage(); y = 52; }
-  });
-
-  doc.save(`guru-de-banca_relatorio_${name.replace(/\s+/g,"_")}.pdf`);
+  $("liveGrade").textContent = done ? g.final.toFixed(1) : "—";
+  $("mood").textContent = done ? (session.answers.at(-1)?.score?.mood || "—") : "—";
 }
 
-/* =========================
-   MAIN ACTIONS
-========================= */
-function buildCtx(){
-  return {
+function renderFeedback(score, q){
+  $("fbBox").classList.remove("hide");
+
+  const mood =
+    score.final >= 8.3 ? {title:"🔥 Excelente. Isso é resposta de quem domina.", color:"var(--g)"} :
+    score.final >= 7.0 ? {title:"😄 Boa. Dá pra passar com segurança.", color:"var(--g)"} :
+    score.final >= 6.0 ? {title:"😐 Ok… mas tem vulnerabilidade.", color:"var(--y)"} :
+                         {title:"😬 Perigoso. Isso sangra nota em banca chata.", color:"var(--r2)"};
+
+  $("fbTitle").textContent = mood.title;
+  $("fbTitle").style.color = mood.color;
+
+  const d = score.dims;
+  $("fbSummary").innerHTML =
+    `<b>Nota desta resposta:</b> ${score.final.toFixed(1)} / 10 • ` +
+    `Clareza ${d.clarity.toFixed(1)} | Evidência ${d.evidence.toFixed(1)} | Método ${d.method.toFixed(1)} | Limites ${d.limits.toFixed(1)} | Coerência ${d.coherence.toFixed(1)} | Segurança ${d.confidence.toFixed(1)} ` +
+    `<br><span class="small"><b>Erro comum:</b> ${q.commonError} • <b>Dica de ouro:</b> ${q.goldenTip}</span>`;
+
+  const items = [];
+  (score.issues||[]).forEach(x=>items.push(`❌ ${x}`));
+  (score.tips||[]).forEach(x=>items.push(`🔧 ${x}`));
+  if(!items.length) items.push("✅ Resposta consistente. Agora mantenha isso sem se contradizer nas próximas perguntas.");
+
+  $("fbList").innerHTML = items.map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  $("followQ").textContent = q.follow;
+}
+
+/* ======================
+   BUILD SESSION
+====================== */
+async function start(){
+  const abstract = $("abstractText").value.trim();
+  if(wordsCount(abstract) < 35){
+    toast("Resumo fraco", "Cole um resumo com pelo menos ~35 palavras. É dele que saem perguntas específicas.");
+    return;
+  }
+
+  const ctx = {
     studentName: $("studentName").value.trim(),
     level: $("level").value,
     area: $("area").value,
+    studyType: $("studyType").value,
     severity: $("severity").value,
+    nQuestions: $("nQuestions").value,
+    difficultyMix: $("difficultyMix").value,
   };
-}
 
-async function startWithPdf(){
+  const anchors = extractAnchors(abstract);
+  $("kpiAnchor").textContent = String(anchors.length);
+
+  // PDF opcional
+  let pdfInfo = { ok:false, words:0, pages:0 };
   const file = $("pdfInput").files?.[0];
-  const ctx = buildCtx();
-
-  if(!file){
-    toast("Sem PDF", "Carregue um PDF ou use o modo DEMO.");
-    return;
-  }
-
-  toast("Lendo PDF", "Extraindo texto… (seu navegador vai trabalhar um pouco)");
-  let extracted;
-  try{
-    extracted = await extractPdfText(file);
-  } catch(e){
-    console.error(e);
-    toast("Erro no PDF", "Não consegui ler esse PDF. Tente outro arquivo ou o modo DEMO.");
-    return;
-  }
-
-  const words = wordsCount(extracted.text);
-  const meta = detectSections(extracted.text);
-
-  session = makeEmptySession(ctx, meta);
-  session.meta.pages = extracted.pages;
-  session.meta.words = words;
-  session.meta.rawText = extracted.text.slice(0, 220000); // limite para não explodir storage
-
-  // perguntas
-  session.questions = buildQuestionBank({ level: ctx.level, area: ctx.area, severity: ctx.severity, meta });
-  session.qi = 0;
-  session.answers = [];
-
-  saveSession();
-
-  renderMeta(meta, extracted.pages, words);
-  $("qTotal").textContent = String(session.questions.length);
-  renderQuestion();
-  toast("Pronto", "Vamos começar. Responda como se estivesse na frente da banca.");
-}
-
-function startDemo(){
-  const ctx = buildCtx();
-  const demoText = `
-  Título: Efeitos de variáveis ambientais na dinâmica de um ecossistema urbano.
-  Introdução: Este trabalho discute...
-  Objetivo geral: avaliar a relação entre temperatura e um indicador ambiental.
-  Objetivos específicos: (1) descrever padrões, (2) testar associação...
-  Metodologia: séries temporais e análise estatística com modelos...
-  Resultados: observou-se aumento...
-  Discussão: interpretações...
-  Conclusão: recomendações...
-  Limitações: amostra e sazonalidade...
-  Referências: ...
-  `;
-  const meta = detectSections(demoText);
-  session = makeEmptySession(ctx, meta);
-  session.meta.pages = 12;
-  session.meta.words = wordsCount(demoText);
-  session.meta.rawText = demoText;
-
-  session.questions = buildQuestionBank({ level: ctx.level, area: ctx.area, severity: ctx.severity, meta });
-  session.qi = 0;
-  session.answers = [];
-
-  saveSession();
-
-  renderMeta(meta, session.meta.pages, session.meta.words);
-  $("qTotal").textContent = String(session.questions.length);
-  renderQuestion();
-  toast("DEMO ativo", "Isso é apenas simulação sem PDF real. Para valer, faça upload do PDF.");
-}
-
-function resume(){
-  const s = loadSession();
-  if(!s){
-    toast("Nada salvo", "Não encontrei sessão salva neste navegador.");
-    return;
-  }
-  session = s;
-  setModePill();
-  renderMeta(session.meta, session.meta.pages, session.meta.words);
-  $("qTotal").textContent = String(session.questions.length);
-  renderQuestion();
-  toast("Retomado", "Sessão carregada. Continue a simulação.");
-}
-
-function answerFlow(){
-  if(!session){
-    toast("Sem sessão", "Faça upload/análise ou use o modo DEMO.");
-    return;
-  }
-  const q = session.questions[session.qi];
-  if(!q){
-    toast("Fim", "Sem mais perguntas. Gere o relatório.");
-    return;
-  }
-  const ans = $("answer").value.trim();
-  if(!ans){
-    toast("Cadê a resposta?", "Em banca, silêncio não pontua. Escreva algo objetivo.");
-    return;
-  }
-
-  const score = evaluateAnswer(q, ans, session.ctx);
-
-  // follow-up (pode variar pela severidade)
-  let follow = q.follow;
-  if(session.ctx.severity === "hard"){
-    // faz follow-up mais agressivo se a resposta foi ruim
-    const a = avgScore(score);
-    if(a < 6.2){
-      follow = "Ok, mas isso NÃO respondeu a pergunta. Reformule em 2 frases: ponto + evidência. Agora.";
-    } else if(a < 7.2){
-      follow = "Certo, mas onde está a sua evidência? Me dê o dado/critério e a limitação na mesma resposta.";
+  if(file){
+    try{
+      toast("PDF (opcional)", "Tentando extrair texto do PDF…");
+      const ex = await extractPdfText(file);
+      const w = wordsCount(ex.text);
+      pdfInfo = { ok:true, words:w, pages:ex.pages };
+      $("kpiPDF").textContent = w ? `${w} palavras` : "0 (provável escaneado)";
+    } catch(e){
+      console.warn(e);
+      $("kpiPDF").textContent = "falhou";
     }
+  } else {
+    $("kpiPDF").textContent = "—";
   }
 
-  session.answers.push({ q, answer: ans, score, at: nowISO() });
+  // diagnóstico simples
+  const conf =
+    anchors.length >= 6 ? "ALTA" :
+    anchors.length >= 3 ? "MÉDIA" : "BAIXA";
+  $("kpiConf").textContent = conf;
+
+  // gerar perguntas
+  const questions = buildQuestions(ctx, anchors);
+  $("kpiQ").textContent = String(questions.length);
+
+  session = {
+    version:2,
+    createdAt: nowISO(),
+    ctx,
+    abstract,
+    anchors,
+    pdfInfo,
+    questions,
+    qi:0,
+    answers:[]
+  };
+
+  $("digest").innerHTML =
+    `<b>Diagnóstico:</b> ${conf}. ` +
+    `Perguntas são geradas do seu resumo (âncoras + frases-chave). ` +
+    `Se o PDF for escaneado, tudo bem — o resumo resolve.`;
 
   saveSession();
-  renderFeedback(score, follow);
-
-  // atualizar nota/progresso
-  const done = session.answers.length;
-  const total = session.questions.length;
-  $("qDone").textContent = String(done);
-  $("progressFill").style.width = total ? pct(done/total) : "0%";
-  $("liveGrade").textContent = computeGrade(session).final.toFixed(1);
+  renderQuestion();
+  toast("Vamos!", "Começou. Responda como se estivesse na banca. Objetivo + evidência + limite.");
 }
 
-function nextQuestion(){
-  if(!session) return;
+function next(){
   session.qi++;
   if(session.qi >= session.questions.length){
-    toast("Acabou", "Você terminou as perguntas. Gere o relatório final.");
-    session.qi = session.questions.length; // clamp
+    toast("Fim", "Acabaram as perguntas. Gere o relatório final.");
+    session.qi = session.questions.length;
     saveSession();
     renderQuestion();
     return;
@@ -1178,56 +1568,310 @@ function nextQuestion(){
   renderQuestion();
 }
 
-async function finish(){
+function answerFlow(isIDK=false){
   if(!session){
-    toast("Sem sessão", "Faça upload/análise ou use o modo DEMO.");
+    toast("Sem sessão", "Clique em Analisar e começar (ou carregue DEMO).");
     return;
   }
-  if(session.answers.length < 4){
-    toast("Pouco treino", "Responda pelo menos 4 perguntas antes de gerar o relatório (senão vira chute).");
-    return;
-  }
-  toast("Gerando PDF", "Montando seu relatório final…");
-  await generatePdfReport(session);
-  toast("Relatório pronto", "PDF baixado. Agora treine as perguntas prováveis e repita o simulado.");
-}
-
-/* =========================
-   BUTTONS
-========================= */
-$("btnAnalyze").addEventListener("click", startWithPdf);
-$("btnLoadDemo").addEventListener("click", startDemo);
-$("btnResume").addEventListener("click", resume);
-$("btnReset").addEventListener("click", resetSession);
-
-$("btnAnswer").addEventListener("click", answerFlow);
-$("btnHint").addEventListener("click", ()=>{
-  if(!session) return toast("Sem sessão","Faça upload/análise ou use DEMO.");
   const q = session.questions[session.qi];
-  const hint =
-    q.tags.includes("core") ? "Estruture em 2–3 frases: **problema/objetivo** + **por que importa** + **o que você fez**." :
-    q.tags.includes("metodo") ? "Diga: **por que escolheu** + **o que controla** + **o que não controla (limite)**." :
-    q.tags.includes("estatistica") ? "Diga: **o que você estima** + **qual suposição** + **como mede incerteza**." :
-    q.tags.includes("teoria") ? "Diga: **conceito central** + **autor/linha** + **como você operacionaliza**." :
-    "Diga: **achado** + **evidência** + **alternativa** + **limitação**.";
-  toast("Dica de banca", hint, 3200);
-});
+  if(!q){
+    toast("Fim", "Gere o relatório final.");
+    return;
+  }
 
-$("btnIDK").addEventListener("click", ()=>{
-  $("answer").value =
-`Eu não tenho esse detalhe de memória agora, mas posso responder com transparência:
+  let ans = $("answer").value.trim();
+  if(isIDK){
+    ans =
+`Eu não tenho esse detalhe de memória agora, mas consigo responder com transparência:
 (1) O que eu consigo afirmar com segurança é: ______.
 (2) O que eu precisaria consultar/rodar para responder exatamente é: ______.
 (3) Isso não invalida o trabalho porque: ______.
-(4) Como agenda futura, eu faria: ______.`;
-  toast("Boa estratégia", "Use isso para NÃO travar na banca. Agora complete os campos.");
+(4) Como continuidade, eu faria: ______.`;
+    $("answer").value = ans;
+  }
+  ans = $("answer").value.trim();
+  if(!ans){
+    toast("Cadê a resposta?", "Em banca, silêncio não pontua. Responda objetivamente.");
+    return;
+  }
+
+  const score = evaluateAnswer(q, ans, session.ctx);
+  session.answers.push({ q, answer: ans, score, isIDK, at: nowISO() });
+
+  // confetti / feedback emocional
+  if(score.final >= 8.3){
+    confetti.burst(160, 1300);
+    toast("🔥 BOA!", "Isso é resposta de quem domina. Mantém esse padrão.");
+  } else if(score.final >= 7.0){
+    confetti.burst(90, 900);
+    toast("😄 Ok!", "Você está no caminho. Só deixa mais concreto quando puder.");
+  } else if(score.final >= 6.0){
+    toast("😐 Atenção", "Dá pra passar, mas banca chata vai apertar. Use evidência + limite.");
+  } else {
+    toast("😬 Calma", "Não é fracasso. É treino. Vamos ajustar e subir sua nota.");
+  }
+
+  // atualizar UI
+  saveSession();
+  renderFeedback(score, q);
+
+  const done = session.answers.length;
+  const total = session.questions.length;
+  $("done").textContent = String(done);
+  $("total").textContent = String(total);
+  $("progFill").style.width = total ? pct(done/total) : "0%";
+
+  const g = computeGrade(session);
+  $("liveGrade").textContent = g.final.toFixed(1);
+  $("mood").textContent = score.mood;
+}
+
+async function finish(){
+  if(!session){
+    toast("Sem sessão", "Inicie uma simulação primeiro.");
+    return;
+  }
+  if(session.answers.length < 5){
+    toast("Pouco treino", "Responda pelo menos 5 perguntas para o relatório ficar confiável.");
+    return;
+  }
+  await generateReportPDF(session);
+}
+
+async function generateReportPDF(session){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:"pt", format:"a4" });
+
+  const name = (session.ctx.studentName || "Aluno(a)").trim();
+  const lvl = {tcc:"TCC",msc:"Mestrado",phd:"Doutorado"}[session.ctx.level];
+  const area = {bio:"Biológicas/Ambientais",exa:"Exatas/Tecnologia",hum:"Humanas/Sociais",int:"Interdisciplinar"}[session.ctx.area];
+  const st = {quant:"Quantitativo",qual:"Qualitativo",mixed:"Misto",theory:"Teórico",applied:"Aplicado",review:"Revisão"}[session.ctx.studyType];
+  const sev = {calm:"Tranquila",tech:"Técnica",hard:"Chata"}[session.ctx.severity];
+
+  const grade = computeGrade(session);
+  const issues = topIssues(session);
+  const byM = byMemberSummary(session);
+
+  // perguntas “mais prováveis”: as que você foi pior + 6 aleatórias do banco
+  const sorted = session.answers.slice().sort((a,b)=>a.score.final-b.score.final);
+  const worst = sorted.slice(0,6).map(x=>x.q);
+  const extra = shuffle(session.questions.slice()).slice(0,6);
+  const likely = [];
+  const seen = new Set();
+  [...worst, ...extra].forEach(q=>{
+    if(seen.has(q.id)) return;
+    seen.add(q.id);
+    likely.push(q);
+  });
+
+  let y=54;
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(18);
+  doc.text("GURU DE BANCA — Relatório Final", 40, y); y+=18;
+
+  doc.setFont("helvetica","normal"); doc.setFontSize(11);
+  doc.text(`Gerado em: ${nowISO()}`, 40, y); y+=14;
+  doc.text(`Aluno(a): ${name}`, 40, y); y+=14;
+  doc.text(`Nível: ${lvl} • Área: ${area} • Tipo: ${st} • Banca: ${sev}`, 40, y); y+=18;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Nota estimada", 40, y); y+=14;
+  doc.setFont("helvetica","normal");
+  doc.text(`Nota final estimada: ${grade.final.toFixed(1)} / 10`, 40, y); y+=14;
+  doc.text(`Status: ${grade.status}`, 40, y); y+=18;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Resumo utilizado (base das perguntas)", 40, y); y+=14;
+  doc.setFont("helvetica","normal");
+  doc.text(session.abstract.slice(0,900) + (session.abstract.length>900?"…":""), 40, y, {maxWidth:520});
+  y+= 140;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Riscos críticos (o que pode derrubar nota)", 40, y); y+=14;
+  doc.setFont("helvetica","normal");
+  if(!issues.length){
+    doc.text("Sem padrões de fragilidade detectados (ou respostas muito consistentes).", 40, y); y+=14;
+  } else {
+    issues.forEach(r=>{
+      doc.text(`• (${r.n}x) ${r.txt}`, 40, y, {maxWidth:520});
+      y+=14;
+      if(y>760){ doc.addPage(); y=54; }
+    });
+  }
+  y+=10;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Desempenho por avaliador (para você treinar em cima de pessoas reais)", 40, y); y+=14;
+  doc.setFont("helvetica","normal");
+  Object.entries(byM).forEach(([k,v])=>{
+    doc.text(`• ${k}: média ${v.avg.toFixed(1)} em ${v.count} perguntas`, 40, y);
+    y+=14;
+    if(y>760){ doc.addPage(); y=54; }
+  });
+  y+=10;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Perguntas mais prováveis na banca (treine MUITO)", 40, y); y+=14;
+  doc.setFont("helvetica","normal");
+  likely.slice(0,10).forEach((q,i)=>{
+    doc.text(`${i+1}. (${q.member.name}) ${q.text}`, 40, y, {maxWidth:520});
+    y+=22;
+    if(y>760){ doc.addPage(); y=54; }
+  });
+  y+=10;
+
+  doc.setFont("helvetica","bold");
+  doc.text("Frases de sobrevivência (use sem vergonha)", 40, y); y+=14;
+  doc.setFont("helvetica","normal");
+  const escapes = [
+    "• “Excelente pergunta. Esse ponto foge do escopo do estudo, mas abre uma continuidade objetiva: ______.”",
+    "• “Com o desenho atual eu falo em associação; para causalidade eu precisaria de ______.”",
+    "• “A limitação principal é ______. Eu mitiguei com ______, então a conclusão deve ser lida como ______.”",
+    "• “Uma explicação alternativa é ______. Eu favoreço minha interpretação porque ______.”",
+  ];
+  escapes.forEach(line=>{
+    doc.text(line, 40, y, {maxWidth:520}); y+=16;
+    if(y>760){ doc.addPage(); y=54; }
+  });
+
+  doc.save(`guru-de-banca_v2_${name.replace(/\s+/g,"_")}.pdf`);
+
+  // celebração final conforme nota
+  if(grade.final >= 7.0){
+    confetti.burst(220, 1600);
+    toast("🎉 DEFESA COM CARA DE FESTA!", `Relatório baixado. Nota estimada ${grade.final.toFixed(1)} — você vai bem.`);
+  } else {
+    toast("💪 Você vai virar o jogo", `Relatório baixado. Nota estimada ${grade.final.toFixed(1)} — treine os riscos críticos e refaça o simulado.`);
+  }
+}
+
+/* ======================
+   HINTS
+====================== */
+function hintFor(q, ctx){
+  if(q.tags.includes("core")) return "Responda em 2 frases: **problema** + **por que importa**. Sem contexto longo.";
+  if(q.tags.includes("stats")) return "Mostre que você domina: **suponições** + **como checa** + **limite** + **confusão**.";
+  if(q.tags.includes("qual")) return "Use rigor: **saturação/triangulação/rastreabilidade/reflexividade** + limite.";
+  if(q.tags.includes("method")) return "**delineamento** + **amostra/instrumento** + **viés** + **mitigação**.";
+  if(q.tags.includes("practical")) return "**recomendação condicional** + **onde aplica** + **onde não aplica**.";
+  return "Ponto central → evidência → limite → implicação.";
+}
+
+/* ======================
+   DEMO real
+====================== */
+function loadDemo(){
+  $("studentName").value = "Ernandes";
+  $("level").value = "msc";
+  $("area").value = "bio";
+  $("studyType").value = "mixed";
+  $("severity").value = "hard";
+  $("nQuestions").value = 24;
+  $("difficultyMix").value = "balanced";
+
+  $("abstractText").value =
+`Objetivo: avaliar como a variação sazonal de temperatura e precipitação influencia a ocorrência de focos de calor em municípios do Pantanal. 
+Métodos: estudo observacional com dados mensais (2003–2024) agregados por município, combinando séries climáticas e focos de calor, com análise de associação e defasagem temporal. 
+Resultados: observou-se aumento de focos no mesmo ano de menor precipitação, com maior sensibilidade entre julho e novembro, e diferenças entre planície e planalto. 
+Conclusão: os resultados sugerem que a seca sazonal e extremos climáticos amplificam o risco de incêndios, apoiando estratégias de prevenção e monitoramento direcionadas. 
+Limitações: possíveis vieses por subdetecção de focos e heterogeneidade espacial.`;
+
+  committee = [
+    {name:"Profa. Maria (Teoria)", profiles:["theory","critical"], roleTone:"duro"},
+    {name:"Prof. João (Estatística)", profiles:["stats","method"], roleTone:"técnico"},
+    {name:"Profa. Ana (Qualitativo/Crítica)", profiles:["qual","critical"], roleTone:"duro"},
+    {name:"Prof. Carlos (Políticas Públicas)", profiles:["practical"], roleTone:"aplicado"},
+  ];
+  renderCommittee();
+  saveDraft();
+  renderIdle();
+  toast("DEMO carregado", "Agora clique em 'Analisar e começar simulação'.");
+}
+
+/* ======================
+   RESUME
+====================== */
+function resume(){
+  const loaded = loadSession();
+  if(!loaded || !loaded.session){
+    toast("Nada salvo", "Não encontrei sessão salva.");
+    return;
+  }
+  committee = loaded.committee || [];
+  session = loaded.session;
+
+  if(loaded.draft) applyDraft(loaded.draft);
+  renderCommittee();
+
+  $("kpiAnchor").textContent = String(session.anchors?.length || 0);
+  $("kpiPDF").textContent = session.pdfInfo?.ok ? `${session.pdfInfo.words} palavras` : "—";
+  $("kpiQ").textContent = String(session.questions?.length || 0);
+  $("kpiConf").textContent =
+    (session.anchors?.length || 0) >= 6 ? "ALTA" :
+    (session.anchors?.length || 0) >= 3 ? "MÉDIA" : "BAIXA";
+
+  $("digest").innerHTML = `<b>Sessão retomada:</b> ${session.createdAt}. Continue a simulação.`;
+  renderQuestion();
+  toast("Retomado", "Sessão carregada. Continue respondendo.");
+}
+
+/* ======================
+   HTML escape
+====================== */
+function escapeHtml(str){
+  return (str||"").replace(/[&<>"']/g, s => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[s]));
+}
+
+/* ======================
+   EVENTS
+====================== */
+$("btnAddMember").addEventListener("click", ()=>{
+  addMember($("memberName").value, $("memberPrimary").value);
+});
+$("btnAdd3Default").addEventListener("click", ()=>{
+  committee = [
+    {name:"Profa. (Metodologia)", profiles:["method"], roleTone:"técnico"},
+    {name:"Prof. (Teoria/Crítico)", profiles:["theory","critical"], roleTone:"duro"},
+    {name:"Profa. (Estatística)", profiles:["stats"], roleTone:"técnico"},
+  ];
+  renderCommittee();
+  saveDraft();
+  toast("Banca criada", "Edite perfis se quiser (botão 'Editar perfis').");
 });
 
-$("btnNext").addEventListener("click", nextQuestion);
+$("btnStart").addEventListener("click", start);
+$("btnDemo").addEventListener("click", loadDemo);
+$("btnResume").addEventListener("click", resume);
+$("btnReset").addEventListener("click", resetAll);
+
+$("btnAnswer").addEventListener("click", ()=> answerFlow(false));
+$("btnIDK").addEventListener("click", ()=> answerFlow(true));
+$("btnHint").addEventListener("click", ()=>{
+  if(!session){
+    toast("Dica", "Cole o resumo, crie banca e comece. Depois eu dou dica por pergunta.");
+    return;
+  }
+  const q = session.questions[session.qi];
+  toast("Dica de banca", hintFor(q, session.ctx), 3200);
+});
+
+$("btnNext").addEventListener("click", next);
 $("btnFinish").addEventListener("click", finish);
 
-/* init */
+["studentName","level","area","studyType","severity","abstractText","nQuestions","difficultyMix"].forEach(id=>{
+  $(id).addEventListener("input", ()=>{ setModePill(); saveDraft(); });
+});
+$("severity").addEventListener("change", ()=>{ setModePill(); saveDraft(); });
+
+/* INIT */
+const loaded = loadSession();
+if(loaded?.draft) applyDraft(loaded.draft);
+committee = loaded?.committee || committee;
+renderCommittee();
 renderIdle();
 </script>
+
 </body>
 </html>
