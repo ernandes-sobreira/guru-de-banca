@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GURU DE BANCA — Simulador de Banca Chata</title>
+
+  <!-- PDF.js (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- jsPDF (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111a2e;
+      --card2:#0f1730;
+      --text:#eaf0ff;
+      --muted:#a8b3d6;
+      --line:rgba(255,255,255,.10);
+      --accent:#7c3aed;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --shadow:0 18px 50px rgba(0,0,0,.35);
+      --r:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.22), transparent 60%),
+                  radial-gradient(900px 600px at 90% 20%, rgba(34,197,94,.12), transparent 55%),
+                  radial-gradient(1000px 700px at 40% 90%, rgba(245,158,11,.14), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      position:sticky; top:0; z-index:9;
+      backdrop-filter: blur(10px);
+      background: rgba(11,18,32,.75);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{ max-width:1100px; margin:0 auto; padding:16px; }
+    .top{
+      display:flex; align-items:center; gap:14px; justify-content:space-between;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(124,58,237,1), rgba(34,197,94,1));
+      box-shadow: var(--shadow);
+    }
+    h1{ font-size:16px; margin:0; letter-spacing:.4px; }
+    .sub{ font-size:12px; color:var(--muted); margin-top:2px; }
+    .pill{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line);
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,.03);
+    }
+
+    main{ padding:18px 0 48px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      background: rgba(0,0,0,.12);
+    }
+    .card .hd h2{
+      margin:0; font-size:14px; letter-spacing:.3px;
+    }
+    .card .hd .hint{
+      color:var(--muted); font-size:12px; line-height:1.2;
+    }
+    .card .bd{ padding:14px; }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input[type="file"], select, textarea, input[type="text"]{
+      width:100%;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      outline:none;
+    }
+    textarea{ min-height:130px; resize:vertical; }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width: 520px){ .row{ grid-template-columns:1fr; } }
+
+    .btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+    button{
+      border:0;
+      padding:10px 12px;
+      border-radius: 14px;
+      color: var(--text);
+      background: rgba(124,58,237,.9);
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(124,58,237,.18);
+      transition: transform .05s ease;
+      font-weight:600;
+    }
+    button:active{ transform: translateY(1px); }
+    button.secondary{
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      box-shadow:none;
+      font-weight:600;
+    }
+    button.danger{ background: rgba(239,68,68,.9); box-shadow: 0 10px 24px rgba(239,68,68,.18); }
+    button.good{ background: rgba(34,197,94,.9); box-shadow: 0 10px 24px rgba(34,197,94,.18); }
+
+    .kpis{
+      display:grid; grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 520px){ .kpis{ grid-template-columns:1fr; } }
+
+    .kpi{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      padding:10px 12px;
+    }
+    .kpi .v{ font-size:18px; font-weight:800; }
+    .kpi .t{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+    .mono{ font-family: var(--mono); font-size:12px; color:var(--muted); }
+    .hr{ height:1px; background: var(--line); margin:12px 0; }
+
+    .prof{
+      display:flex; gap:12px; align-items:flex-start;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .avatar{
+      width:44px; height:44px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(245,158,11,.9), rgba(124,58,237,.9));
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+    }
+    .prof .name{ font-weight:800; font-size:13px; }
+    .prof .role{ color:var(--muted); font-size:12px; margin-top:2px; }
+    .prof .msg{ margin-top:8px; font-size:13px; line-height:1.35; }
+
+    .tag{
+      display:inline-block;
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255,255,255,.03);
+      margin-right:6px;
+      margin-top:6px;
+    }
+
+    .feedback{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .feedback h3{ margin:0 0 6px; font-size:13px; }
+    .list{ margin:8px 0 0; padding-left:18px; color:var(--text); }
+    .list li{ margin:6px 0; color:var(--text); }
+    .muted{ color:var(--muted); }
+
+    .small{ font-size:12px; color:var(--muted); }
+    .hide{ display:none !important; }
+
+    .scorebar{
+      height:10px; border-radius:999px; background: rgba(255,255,255,.08);
+      overflow:hidden; border:1px solid var(--line);
+    }
+    .scorefill{
+      height:100%; width:0%;
+      background: linear-gradient(90deg, rgba(239,68,68,.9), rgba(245,158,11,.9), rgba(34,197,94,.9));
+    }
+
+    .toast{
+      position:fixed; right:16px; bottom:16px;
+      background: rgba(17,26,46,.96);
+      border:1px solid var(--line);
+      color: var(--text);
+      padding:12px 12px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      max-width: 360px;
+      z-index:999;
+    }
+    .toast .t{ font-weight:800; font-size:13px; }
+    .toast .b{ margin-top:6px; font-size:12px; color:var(--muted); line-height:1.35; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>GURU DE BANCA</h1>
+        <div class="sub">Simulador de banca chata (TCC • Mestrado • Doutorado) + relatório final em PDF</div>
+      </div>
+    </div>
+    <div class="pill">Modo: <span id="modePill">—</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- LEFT -->
+    <section class="card">
+      <div class="hd">
+        <div>
+          <h2>1) Upload + Configuração</h2>
+          <div class="hint">Carregue seu PDF e escolha o nível/área. Eu vou te apertar com perguntas de banca (daquelas que dão frio na espinha).</div>
+        </div>
+      </div>
+      <div class="bd">
+
+        <label>Seu nome (opcional — vai no relatório)</label>
+        <input id="studentName" type="text" placeholder="Ex: Ana Silva" />
+
+        <div style="height:10px"></div>
+
+        <label>Upload do PDF (TCC / Dissertação / Tese)</label>
+        <input id="pdfInput" type="file" accept="application/pdf" />
+
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <div>
+            <label>Nível</label>
+            <select id="level">
+              <option value="tcc">TCC</option>
+              <option value="msc">Mestrado</option>
+              <option value="phd">Doutorado</option>
+            </select>
+          </div>
+          <div>
+            <label>Área</label>
+            <select id="area">
+              <option value="bio">Biológicas/Ambientais</option>
+              <option value="exa">Exatas/Tecnologia</option>
+              <option value="hum">Humanas/Sociais</option>
+              <option value="int">Interdisciplinar</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <label>Nível da banca</label>
+        <select id="severity">
+          <option value="calm">Tranquila</option>
+          <option value="tech">Técnica</option>
+          <option value="hard" selected>Chata (recomendada)</option>
+        </select>
+
+        <div class="btns">
+          <button class="good" id="btnAnalyze">Analisar PDF e começar</button>
+          <button class="secondary" id="btnLoadDemo">Usar modo DEMO (sem PDF)</button>
+          <button class="secondary" id="btnResume">Retomar sessão salva</button>
+          <button class="danger" id="btnReset">Resetar tudo</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="v" id="kpiPages">—</div>
+            <div class="t">Páginas lidas</div>
+          </div>
+          <div class="kpi">
+            <div class="v" id="kpiWords">—</div>
+            <div class="t">Palavras extraídas</div>
+          </div>
+          <div class="kpi">
+            <div class="v" id="kpiConfidence">—</div>
+            <div class="t">Confiança do diagnóstico</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="mono" id="docDigest">Aguardando PDF…</div>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="card">
+      <div class="hd">
+        <div>
+          <h2>2) Diagnóstico + Simulação</h2>
+          <div class="hint">Pergunta → sua resposta → repregunta chata → feedback. No final: nota estimada e relatório em PDF.</div>
+        </div>
+      </div>
+      <div class="bd">
+
+        <div class="prof">
+          <div class="avatar"></div>
+          <div>
+            <div class="name">Professor(a) da Banca (modo chato)</div>
+            <div class="role" id="profRole">—</div>
+            <div class="msg" id="questionBox">Faça upload e clique em <b>Analisar PDF</b>. Se quiser testar, use o modo DEMO.</div>
+            <div id="questionTags"></div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <label>Sua resposta (objetiva, sem enrolar)</label>
+        <textarea id="answer" placeholder="Responda como se estivesse na banca. Pense em: objetivo → evidência → limite → implicação."></textarea>
+
+        <div class="btns">
+          <button id="btnAnswer">Responder</button>
+          <button class="secondary" id="btnHint">Pedir dica</button>
+          <button class="secondary" id="btnIDK">Não sei responder</button>
+        </div>
+
+        <div class="feedback hide" id="feedbackBox">
+          <h3>Feedback do professor chato</h3>
+          <div class="small" id="feedbackSummary">—</div>
+          <ul class="list" id="feedbackList"></ul>
+          <div class="hr"></div>
+          <div class="small muted">E agora eu vou te apertar de novo (repregunta):</div>
+          <div style="margin-top:8px; font-weight:800" id="followupQ">—</div>
+          <div class="btns">
+            <button class="good" id="btnNext">Próxima pergunta</button>
+            <button class="secondary" id="btnFinish">Finalizar e gerar relatório</button>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="small muted">Progresso da simulação</div>
+        <div class="scorebar" style="margin-top:8px;">
+          <div class="scorefill" id="progressFill"></div>
+        </div>
+        <div class="small" style="margin-top:8px;">
+          Perguntas respondidas: <b id="qDone">0</b> / <b id="qTotal">0</b> • Nota parcial estimada: <b id="liveGrade">—</b>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<div id="toast" class="toast hide">
+  <div class="t" id="toastT">—</div>
+  <div class="b" id="toastB">—</div>
+</div>
+
+<script>
+/* =========================
+   UTIL
+========================= */
+const $ = (id) => document.getElementById(id);
+
+function toast(title, body, ms=2600){
+  $("toastT").textContent = title;
+  $("toastB").textContent = body;
+  $("toast").classList.remove("hide");
+  setTimeout(()=> $("toast").classList.add("hide"), ms);
+}
+
+function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+function wordsCount(s){
+  return (s||"").trim().split(/\s+/).filter(Boolean).length;
+}
+
+function pct(n){ return Math.round(n*100) + "%"; }
+
+function nowISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,19).replace("T"," ");
+}
+
+/* =========================
+   PDF EXTRACTION (PDF.js)
+========================= */
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+async function extractPdfText(file){
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+
+  let full = "";
+  for(let p=1; p<=pdf.numPages; p++){
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    const strings = content.items.map(it => it.str);
+    full += "\n\n" + strings.join(" ");
+  }
+  return { pages: pdf.numPages, text: full };
+}
+
+/* =========================
+   HEURISTIC PARSER
+========================= */
+function normalize(s){
+  return (s||"")
+    .replace(/\s+/g," ")
+    .replace(/[“”]/g,'"')
+    .replace(/[‘’]/g,"'")
+    .trim();
+}
+
+function detectSections(text){
+  const t = text.toLowerCase();
+  const has = (re) => re.test(t);
+
+  const sections = {
+    intro: has(/\b(introdu(ç|c)ão|introducao)\b/),
+    obj: has(/\b(objetivo(s)?|objetivo geral|objetivos específicos|objetivos especificos)\b/),
+    prob: has(/\b(problema de pesquisa|quest(ã|a)o de pesquisa|pergunta de pesquisa)\b/),
+    hypo: has(/\b(hip(ó|o)tese(s)?|hipotese(s)?)\b/),
+    meth: has(/\b(metodologia|materiais e m(é|e)todos|m(é|e)todo(s)?|procedimentos)\b/),
+    res: has(/\b(resultados)\b/),
+    disc: has(/\b(discuss(ã|a)o)\b/),
+    conc: has(/\b(conclus(ã|a)o|considera(ç|c)(õ|o)es finais)\b/),
+    lim: has(/\b(limita(ç|c)(õ|o)es|limitações)\b/),
+    ref: has(/\b(refer(ê|e)ncias|bibliografia)\b/)
+  };
+
+  // tentativa de título: primeiras linhas "fortes"
+  const firstChunk = normalize(text.slice(0, 1200));
+  const lines = firstChunk.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean);
+  let title = "";
+  for(const ln of lines.slice(0, 12)){
+    if(ln.length >= 12 && ln.length <= 180){
+      // heurística: linha com poucas pontuações e mais "maiusculas"
+      const letters = ln.replace(/[^A-Za-zÀ-ÿ]/g,"");
+      const upper = (ln.match(/[A-ZÀ-Ý]/g)||[]).length;
+      const ratio = letters.length ? upper/letters.length : 0;
+      if(ratio > 0.18 && ln.split(" ").length >= 3){
+        title = ln;
+        break;
+      }
+    }
+  }
+
+  // objetivo/problema (extrair trecho com regex simples)
+  const pick = (re) => {
+    const m = text.match(re);
+    if(!m) return "";
+    return normalize(m[1] || m[0]).slice(0, 420);
+  };
+
+  const objective = pick(/objetivo(?: geral)?[:\-–]\s*([\s\S]{30,500}?)(?:\n|\r|\. {1,2}|objetivos específicos|objetivos especificos|metodologia|materiais e métodos)/i);
+  const problem = pick(/(problema de pesquisa|quest(ã|a)o de pesquisa|pergunta de pesquisa)[:\-–]\s*([\s\S]{30,500}?)(?:\n|\r|hip(ó|o)tese|objetivo|metodologia)/i);
+
+  // confiança
+  const hitCount = Object.values(sections).filter(Boolean).length;
+  const confidence =
+    hitCount >= 6 ? "alta" :
+    hitCount >= 3 ? "média" : "baixa";
+
+  return { title, sections, objective, problem, confidence };
+}
+
+/* =========================
+   QUESTION ENGINE
+========================= */
+function buildQuestionBank(ctx){
+  const { level, area, severity, meta } = ctx;
+
+  // tags: ["metodo","teoria","resultado","limite","originalidade","aplicacao","dados","estatistica","etica"]
+  const base = [
+    { id:"core_01", tags:["core","clareza"], text:"Em uma frase: qual é o seu problema de pesquisa? E não me dê contexto: me dê o problema.", follow:"Você consegue mostrar onde isso aparece no texto? Em que página/trecho?"},
+    { id:"core_02", tags:["core","relevancia"], text:"Por que isso importa? Me dê 1 razão científica e 1 razão prática (social, política pública, gestão, tecnologia).", follow:"Se eu discordar, qual evidência você tem para sustentar essa relevância?"},
+    { id:"core_03", tags:["core","objetivos"], text:"Quais são seus objetivos (geral e específicos) e como cada específico vira uma análise/etapa concreta?", follow:"Qual objetivo ficou mais fraco e por quê?"},
+    { id:"core_04", tags:["core","contribuicao"], text:"Qual é sua contribuição original? O que muda no mundo acadêmico depois do seu trabalho?", follow:"Se eu disser que isso já existe na literatura, como você me convence do contrário?"},
+    { id:"core_05", tags:["core","limites"], text:"Qual é a limitação mais grave do seu estudo? A mais perigosa mesmo.", follow:"Se essa limitação for real, o que cai primeiro: método, resultado ou conclusão?"}
+  ];
+
+  const meth = [
+    { id:"m_01", tags:["metodo","coerencia"], text:"Por que você escolheu esse método/delineamento e não outro mais simples ou mais robusto?", follow:"Qual alternativa você considerou e por que descartou?"},
+    { id:"m_02", tags:["metodo","amostra"], text:"Sua amostra (ou corpus/dados) é suficiente e representativa? Defina 'suficiente' com critério.", follow:"Se eu reduzir sua amostra pela metade, suas conclusões ainda ficam em pé?"},
+    { id:"m_03", tags:["metodo","viés"], text:"Quais são os principais vieses do seu desenho e o que você fez para mitigá-los?", follow:"Qual viés você não conseguiu controlar e como isso pode distorcer seu resultado?"},
+    { id:"m_04", tags:["metodo","replicabilidade"], text:"Se eu quiser reproduzir seu estudo amanhã, o que eu preciso saber que NÃO está explícito no seu texto?", follow:"Qual detalhe, se faltar, torna seu estudo irreprodutível?"},
+  ];
+
+  const stats = [
+    { id:"s_01", tags:["estatistica","dados"], text:"Você está inferindo ou só descrevendo? Onde entra a incerteza: intervalo, erro, robustez, sensibilidade?", follow:"Se eu pedir um teste de robustez, qual você faria primeiro?"},
+    { id:"s_02", tags:["estatistica","causalidade"], text:"Você está falando de correlação ou causalidade? Me prove que você sabe a diferença no seu caso.", follow:"Qual variável de confusão pode estar dirigindo seu efeito?"},
+    { id:"s_03", tags:["estatistica","modelo"], text:"Qual suposição do seu modelo/análise é a mais frágil? E o que acontece se ela falhar?", follow:"Como você detectaria que ela falhou, na prática?"}
+  ];
+
+  const theory = [
+    { id:"t_01", tags:["teoria","fundamentacao"], text:"Qual é o pilar teórico do seu trabalho? Se eu tirar isso, seu trabalho ainda existe?", follow:"Qual autor/linha você discorda parcialmente? E por quê?"},
+    { id:"t_02", tags:["teoria","conceitos"], text:"Defina operacionalmente os seus 2 conceitos centrais. Como você mede/observa isso no mundo real?", follow:"Se eu mudar sua definição, seu resultado muda? Em que direção?"},
+    { id:"t_03", tags:["teoria","lacuna"], text:"Qual lacuna EXATA na literatura você está preenchendo? Lacuna real, não 'faltam estudos'.", follow:"Quem é o principal trabalho que você está estendendo ou contrariando?"}
+  ];
+
+  const results = [
+    { id:"r_01", tags:["resultado","evidencia"], text:"Qual é o seu resultado mais forte? Me diga o achado e a evidência que o sustenta.", follow:"Qual explicação alternativa existe para esse achado?"},
+    { id:"r_02", tags:["resultado","discussao"], text:"Onde você pode estar super-interpretando seus dados? Aponte uma frase do seu texto que você mesmo reescreveria.", follow:"Qual seria uma versão mais cautelosa dessa frase?"},
+    { id:"r_03", tags:["resultado","generalizacao"], text:"Até onde você pode generalizar? Onde você NÃO pode generalizar de jeito nenhum?", follow:"Se alguém aplicar sua conclusão fora do seu contexto, qual erro ela cometeria?"}
+  ];
+
+  const ethics = [
+    { id:"e_01", tags:["etica","dados"], text:"Existe risco ético, viés social, privacidade, impacto em grupos? Como você tratou isso?", follow:"Se eu for duro: onde você pode ter sido ingênuo(a) eticamente?"},
+  ];
+
+  const practical = [
+    { id:"p_01", tags:["aplicacao","impacto"], text:"Se eu te der 2 minutos com um gestor/político/empresa: qual recomendação prática você faz, com base no seu trabalho?", follow:"O que pode dar errado se aplicarem sua recomendação sem cautela?"},
+    { id:"p_02", tags:["aplicacao","futuro"], text:"Qual é a agenda de pesquisa/continuidade mais óbvia após sua defesa? Seja específico.", follow:"Qual continuação seria mais 'barata' e qual seria a mais 'transformadora'?"}
+  ];
+
+  // Ajustes por área (pequenos, mas úteis)
+  if(area === "hum"){
+    practical.push({ id:"h_01", tags:["metodo","hum"], text:"Como você garante validade/credibilidade (triangulação, saturação, confiabilidade, rigor interpretativo)?", follow:"Se eu disser que é 'só opinião', como você responde?"});
+  }
+  if(area === "exa"){
+    stats.push({ id:"x_01", tags:["metodo","exa"], text:"Qual parte do seu pipeline é mais vulnerável a erro (pré-processamento, parâmetro, validação, implementação)?", follow:"Como você testou/certificou que não é bug?"});
+  }
+  if(area === "bio"){
+    meth.push({ id:"b_01", tags:["metodo","bio"], text:"Que controles (experimentais/observacionais) garantem que o efeito não é artefato do ambiente/coleta?", follow:"Qual variável ambiental não controlada pode inverter sua interpretação?"});
+  }
+
+  // Seleção guiada pela presença de seções
+  const bank = [...base];
+
+  const s = meta.sections || {};
+  const includeMeth = s.meth || severity !== "calm";
+  const includeTheory = s.intro || s.ref || severity !== "calm";
+  const includeResults = s.res || s.disc || s.conc || severity !== "calm";
+
+  if(includeMeth) bank.push(...meth, ...stats);
+  if(includeTheory) bank.push(...theory);
+  if(includeResults) bank.push(...results, ...practical);
+  if(severity !== "calm") bank.push(...ethics);
+
+  // Em “chata”, aumenta o núcleo e adiciona “pegadinhas”
+  if(severity === "hard"){
+    bank.push(
+      { id:"h_peg_01", tags:["core","pegadinha"], text:"Se eu disser que seu objetivo NÃO está alinhado ao método, onde exatamente você prova que está?", follow:"Qual parte do método você mudaria para alinhar melhor?"},
+      { id:"h_peg_02", tags:["metodo","pegadinha"], text:"Qual é a crítica mais destrutiva que alguém poderia fazer ao seu trabalho? Faça por mim.", follow:"Agora se defenda — sem ser defensivo(a)."},
+      { id:"h_peg_03", tags:["resultado","pegadinha"], text:"Qual resultado seu pode ser simplesmente ruído? Qual parte pode ser efeito de confusão?", follow:"Qual análise adicional reduziria essa dúvida?"}
+    );
+  }
+
+  // Em “tranquila”, limita a quantidade e suaviza
+  let final = bank;
+
+  // ordem: core primeiro, depois método/teoria/resultados
+  final.sort((a,b)=>{
+    const A = a.tags.includes("core") ? 0 : 1;
+    const B = b.tags.includes("core") ? 0 : 1;
+    return A - B;
+  });
+
+  // tamanho por nível
+  const n =
+    level === "tcc" ? 18 :
+    level === "msc" ? 24 : 30;
+
+  // embaralhar mantendo núcleo no topo
+  const core = final.filter(q => q.tags.includes("core"));
+  const rest = final.filter(q => !q.tags.includes("core"));
+  shuffle(rest);
+  final = [...core, ...rest].slice(0, n);
+
+  // garante followup
+  final = final.map(q => ({...q, follow: q.follow || "Ok. Mas por que eu deveria acreditar nisso?"}));
+
+  return final;
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
+
+/* =========================
+   SCORING (Heurístico)
+========================= */
+function evaluateAnswer(q, answer, ctx){
+  const a = (answer||"").trim();
+  const wc = wordsCount(a);
+
+  // Heurísticas simples (mas úteis)
+  const tooShort = wc < 35;
+  const tooLong  = wc > 220;
+
+  const hasStructure = /porque|portanto|assim|logo|evid(ê|e)ncia|dados|resultado|m(é|e)todo|limita(ç|c)(ã|a)o|no meu estudo/i.test(a);
+  const hasNumbers = /\d/.test(a);
+  const hedging = /(acho|talvez|meio que|tipo|sei lá|não lembro|creio|imagino)/i.test(a);
+
+  // penalidades/bonus por severidade
+  const sev = ctx.severity;
+  let clarity = 6.5, method = 6.5, theory = 6.5, result = 6.5, limits = 6.5, confidence = 6.5;
+
+  // Clareza
+  if(tooShort) clarity -= 2.2;
+  if(tooLong) clarity -= 1.2;
+  if(hasStructure) clarity += 1.2;
+  if(hedging) clarity -= 1.2;
+
+  // Método
+  if(q.tags.includes("metodo") || q.tags.includes("estatistica")){
+    if(hasStructure) method += 1.0;
+    if(hasNumbers) method += 0.8;
+    if(tooShort) method -= 1.8;
+    if(hedging) method -= 1.0;
+  }
+
+  // Teoria
+  if(q.tags.includes("teoria")){
+    if(/autor|literatura|teoria|conceito|refer(ê|e)ncia/i.test(a)) theory += 1.1;
+    if(tooShort) theory -= 1.6;
+    if(hedging) theory -= 0.8;
+  }
+
+  // Resultado/Discussão
+  if(q.tags.includes("resultado") || q.tags.includes("aplicacao")){
+    if(/encontrei|observ(ei|amos)|mostrou|indicou|aumentou|reduziu|associ/i.test(a)) result += 1.0;
+    if(/alternativa|confus|incertez|interval|robust|sensibil/i.test(a)) result += 1.0;
+    if(tooShort) result -= 1.8;
+  }
+
+  // Limitações
+  if(q.tags.includes("limite") || /limita/i.test(q.text)){
+    if(/limita|vi(e|é)s|restri(ç|c)(ã|a)o|amostra|generaliza/i.test(a)) limits += 1.2;
+    if(/mas|por(é|e)m|contudo/i.test(a)) limits += 0.5;
+    if(tooShort) limits -= 1.5;
+  }
+
+  // Segurança
+  confidence += (hasStructure ? 0.9 : -0.6);
+  confidence += (hedging ? -1.6 : 0.3);
+  confidence += (tooShort ? -1.0 : 0.4);
+
+  // Bancas mais chatas punem mais enrolação e “não sei”
+  if(sev === "hard"){
+    if(tooLong) confidence -= 0.8;
+    if(hedging) confidence -= 0.8;
+  }
+
+  // Clamp 0-10
+  const dims = {
+    clarity: clamp(clarity,0,10),
+    theory: clamp(theory,0,10),
+    method: clamp(method,0,10),
+    result: clamp(result,0,10),
+    limits: clamp(limits,0,10),
+    confidence: clamp(confidence,0,10),
+  };
+
+  // comentários “chatos”
+  const hits = [];
+  if(tooShort) hits.push("Muito curto. Em banca, isso soa como insegurança ou falta de domínio.");
+  if(tooLong) hits.push("Longo demais. Você está se defendendo em vez de responder.");
+  if(hedging) hits.push("Cuidado com 'acho', 'talvez', 'tipo'. Banca chata marca isso como fragilidade.");
+  if(!hasStructure) hits.push("Faltou estrutura: objetivo → evidência → limite → implicação.");
+
+  // sugestões “frases prontas”
+  const tips = [];
+  if(!hasStructure) tips.push("Use a estrutura: **(1)** ponto central, **(2)** evidência/dado, **(3)** limitação, **(4)** implicação.");
+  if(q.tags.includes("estatistica") && !hasNumbers) tips.push("Quando der, cite pelo menos **um número** (n, período, efeito, erro, intervalo).");
+  if(q.tags.includes("limite") && !/limita|vi(e|é)s|restri/i.test(a)) tips.push("Assuma uma limitação real e diga como você mitigou ou como isso entra em trabalhos futuros.");
+
+  return { dims, hits, tips, wc };
+}
+
+/* =========================
+   REPORT / GRADE
+========================= */
+function computeGrade(session){
+  const { level } = session.ctx;
+
+  // médias
+  const avg = (k) => {
+    const arr = session.answers.map(x => x.score?.dims?.[k]).filter(v => typeof v === "number");
+    if(!arr.length) return 0;
+    return arr.reduce((a,b)=>a+b,0)/arr.length;
+  };
+
+  const clarity = avg("clarity");
+  const theory  = avg("theory");
+  const method  = avg("method");
+  const result  = avg("result");
+  const limits  = avg("limits");
+  const conf    = avg("confidence");
+
+  // pesos por nível
+  let w;
+  if(level === "tcc"){
+    w = { clarity:.20, theory:.14, method:.22, result:.16, limits:.14, confidence:.14 };
+  } else if(level === "msc"){
+    w = { clarity:.16, theory:.18, method:.20, result:.18, limits:.14, confidence:.14 };
+  } else { // phd
+    w = { clarity:.14, theory:.20, method:.22, result:.18, limits:.12, confidence:.14 };
+  }
+
+  const final = clarity*w.clarity + theory*w.theory + method*w.method + result*w.result + limits*w.limits + conf*w.confidence;
+
+  return {
+    dims: { clarity, theory, method, result, limits, confidence: conf },
+    final: clamp(final,0,10)
+  };
+}
+
+function topRisks(session){
+  // conta recorrências de problemas
+  const issues = [];
+  for(const a of session.answers){
+    for(const h of (a.score?.hits||[])){
+      issues.push(h);
+    }
+  }
+  const freq = {};
+  issues.forEach(x => freq[x] = (freq[x]||0)+1);
+
+  const ranked = Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+  return ranked.slice(0,5).map(([txt,n])=>({txt,n}));
+}
+
+function likelyQuestions(session){
+  // retorna 10 perguntas "mais prováveis" = core + tags críticas + as que o aluno foi pior
+  const answers = session.answers.slice();
+  answers.sort((a,b)=>{
+    const sa = avgScore(a.score), sb = avgScore(b.score);
+    return sa - sb; // pior primeiro
+  });
+  const worst = answers.slice(0,6).map(x => x.q);
+
+  const core = session.questions.filter(q => q.tags.includes("core")).slice(0,6);
+  const set = new Map();
+  [...core, ...worst].forEach(q => set.set(q.id, q));
+  return Array.from(set.values()).slice(0,10);
+}
+
+function avgScore(score){
+  if(!score?.dims) return 0;
+  const v = Object.values(score.dims);
+  return v.reduce((a,b)=>a+b,0)/v.length;
+}
+
+/* =========================
+   SESSION STATE
+========================= */
+const SESSION_KEY = "guru_de_banca_session_v1";
+
+let session = null;
+
+function makeEmptySession(ctx, meta){
+  return {
+    version: 1,
+    createdAt: nowISO(),
+    ctx,
+    meta,
+    questions: [],
+    qi: 0,
+    answers: [],
+  };
+}
+
+function saveSession(){
+  if(!session) return;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+
+function loadSession(){
+  const raw = localStorage.getItem(SESSION_KEY);
+  if(!raw) return null;
+  try{ return JSON.parse(raw); } catch(e){ return null; }
+}
+
+function resetSession(){
+  localStorage.removeItem(SESSION_KEY);
+  session = null;
+  renderIdle();
+  toast("Resetado", "Sessão apagada. Agora faça upload do PDF novamente.");
+}
+
+/* =========================
+   RENDER
+========================= */
+function setModePill(){
+  if(!session){ $("modePill").textContent = "—"; return; }
+  const lvl = {tcc:"TCC",msc:"Mestrado",phd:"Doutorado"}[session.ctx.level];
+  const sev = {calm:"Tranquila",tech:"Técnica",hard:"Chata"}[session.ctx.severity];
+  $("modePill").textContent = `${lvl} • ${sev}`;
+}
+
+function renderIdle(){
+  $("kpiPages").textContent = "—";
+  $("kpiWords").textContent = "—";
+  $("kpiConfidence").textContent = "—";
+  $("docDigest").textContent = "Aguardando PDF…";
+  $("profRole").textContent = "—";
+  $("questionBox").innerHTML = 'Faça upload e clique em <b>Analisar PDF</b>. Se quiser testar, use o modo DEMO.';
+  $("questionTags").innerHTML = "";
+  $("feedbackBox").classList.add("hide");
+  $("answer").value = "";
+  $("qDone").textContent = "0";
+  $("qTotal").textContent = "0";
+  $("liveGrade").textContent = "—";
+  $("progressFill").style.width = "0%";
+  setModePill();
+}
+
+function renderMeta(meta, pages, words){
+  $("kpiPages").textContent = pages ?? "—";
+  $("kpiWords").textContent = words ?? "—";
+  $("kpiConfidence").textContent = meta?.confidence ? meta.confidence.toUpperCase() : "—";
+
+  const s = meta.sections || {};
+  const title = meta.title ? `Título (aprox): "${meta.title}"` : "Título: (não detectado com confiança)";
+  const obj = meta.objective ? `Objetivo (trecho): ${meta.objective}` : "Objetivo: (não detectado)";
+  const prob = meta.problem ? `Problema (trecho): ${meta.problem}` : "Problema: (não detectado)";
+
+  const flags = Object.entries(s).filter(([k,v])=>v).map(([k])=>k.toUpperCase());
+  $("docDigest").textContent =
+    `${title}\n${obj}\n${prob}\nSeções detectadas: ${flags.length ? flags.join(", ") : "poucas/nenhuma"}\nDica: se a confiança estiver baixa, seu PDF pode estar sem cabeçalhos claros.`;
+}
+
+function renderQuestion(){
+  setModePill();
+  const q = session.questions[session.qi];
+  if(!q){
+    $("questionBox").innerHTML = "Sem mais perguntas. Gere o relatório final.";
+    $("questionTags").innerHTML = "";
+    $("qTotal").textContent = String(session.questions.length);
+    return;
+  }
+
+  // “personas” mínimas por tag
+  let role = "Eu já participei de mais de 100 bancas. Responda com precisão.";
+  if(q.tags.includes("metodo")) role = "Metodologia: vou caçar incoerência e viés.";
+  if(q.tags.includes("teoria")) role = "Teoria: vou testar sua fundamentação e conceito.";
+  if(q.tags.includes("resultado")) role = "Resultados: vou apertar robustez e interpretação.";
+  if(q.tags.includes("estatistica")) role = "Estatística: vou perguntar suposições e incerteza.";
+  if(q.tags.includes("core")) role = "Básico: se você erra isso, a banca te desmonta.";
+
+  $("profRole").textContent = role;
+  $("questionBox").textContent = q.text;
+
+  $("questionTags").innerHTML =
+    q.tags.map(t => `<span class="tag">${t}</span>`).join("");
+
+  $("answer").value = "";
+  $("feedbackBox").classList.add("hide");
+
+  const done = session.answers.length;
+  const total = session.questions.length;
+  $("qDone").textContent = String(done);
+  $("qTotal").textContent = String(total);
+
+  const g = computeGrade(session).final;
+  $("liveGrade").textContent = g ? g.toFixed(1) : "—";
+
+  $("progressFill").style.width = total ? pct(done/total) : "0%";
+}
+
+function renderFeedback(score, followup){
+  $("feedbackBox").classList.remove("hide");
+
+  const dims = score.dims;
+  const avg = avgScore(score);
+
+  const mood =
+    avg >= 8.2 ? {c:"good", t:"Boa. Não me decepcionou (ainda)."} :
+    avg >= 6.6 ? {c:"warn", t:"Dá pra passar, mas tem vulnerabilidade."} :
+                 {c:"bad",  t:"Perigoso. Em banca chata, isso sangra nota."};
+
+  $("feedbackSummary").innerHTML =
+    `<b style="color:var(--${mood.c})">${mood.t}</b> • ` +
+    `Clareza ${dims.clarity.toFixed(1)} | Teoria ${dims.theory.toFixed(1)} | Método ${dims.method.toFixed(1)} | Resultados ${dims.result.toFixed(1)} | Limites ${dims.limits.toFixed(1)} | Segurança ${dims.confidence.toFixed(1)} ` +
+    `<span class="muted">• ${score.wc} palavras</span>`;
+
+  const li = [];
+  (score.hits||[]).forEach(x => li.push(`❌ ${x}`));
+  (score.tips||[]).forEach(x => li.push(`🔧 ${x}`));
+  if(!li.length) li.push("✅ Resposta ok. Agora sustente isso com consistência e evidência.");
+
+  $("feedbackList").innerHTML = li.map(x => `<li>${x}</li>`).join("");
+  $("followupQ").textContent = followup;
+}
+
+/* =========================
+   REPORT PDF
+========================= */
+async function generatePdfReport(session){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:"pt", format:"a4" });
+
+  const name = (session.ctx.studentName || "Aluno(a)").trim();
+  const levelLabel = {tcc:"TCC",msc:"Mestrado",phd:"Doutorado"}[session.ctx.level];
+  const sevLabel = {calm:"Tranquila",tech:"Técnica",hard:"Chata"}[session.ctx.severity];
+  const areaLabel = {bio:"Biológicas/Ambientais",exa:"Exatas/Tecnologia",hum:"Humanas/Sociais",int:"Interdisciplinar"}[session.ctx.area];
+
+  const g = computeGrade(session);
+  const risks = topRisks(session);
+  const qLikely = likelyQuestions(session);
+
+  const meta = session.meta || {};
+  const title = meta.title || "(título não detectado)";
+  const conf = (meta.confidence || "baixa").toUpperCase();
+
+  let y = 52;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text("GURU DE BANCA — Relatório de Preparação", 40, y); y += 18;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(`Gerado em: ${nowISO()}`, 40, y); y += 14;
+
+  doc.setFont("helvetica", "bold");
+  doc.text(`Aluno(a): `, 40, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(name, 98, y); y += 14;
+
+  doc.setFont("helvetica", "bold");
+  doc.text(`Nível: `, 40, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${levelLabel} • Área: ${areaLabel} • Banca: ${sevLabel}`, 84, y); y += 16;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Trabalho (diagnóstico do PDF)", 40, y); y += 14;
+  doc.setFont("helvetica", "normal");
+  doc.text(`Título: ${title}`, 40, y, { maxWidth: 520 }); y += 14;
+  doc.text(`Confiança do diagnóstico: ${conf}`, 40, y); y += 14;
+
+  if(meta.objective){
+    doc.text(`Objetivo (trecho): ${meta.objective}`, 40, y, { maxWidth: 520 }); y += 28;
+  } else {
+    doc.text("Objetivo: não detectado automaticamente. Sugestão: deixe claro no texto com cabeçalho 'Objetivo'.", 40, y, { maxWidth: 520 }); y += 28;
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Nota estimada da banca", 40, y); y += 14;
+
+  doc.setFont("helvetica", "normal");
+  doc.text(`Nota final estimada: ${g.final.toFixed(1)} / 10`, 40, y); y += 14;
+  doc.text(`Clareza: ${g.dims.clarity.toFixed(1)} | Teoria: ${g.dims.theory.toFixed(1)} | Método: ${g.dims.method.toFixed(1)}`, 40, y); y += 14;
+  doc.text(`Resultados: ${g.dims.result.toFixed(1)} | Limitações: ${g.dims.limits.toFixed(1)} | Segurança: ${g.dims.confidence.toFixed(1)}`, 40, y); y += 18;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Riscos críticos (o que pode derrubar sua nota)", 40, y); y += 14;
+  doc.setFont("helvetica", "normal");
+  if(!risks.length){
+    doc.text("Sem riscos frequentes detectados (poucas respostas ou respostas consistentes).", 40, y); y += 14;
+  } else {
+    for(const r of risks){
+      doc.text(`• (${r.n}x) ${r.txt}`, 40, y, { maxWidth: 520 }); y += 14;
+      if(y > 760){ doc.addPage(); y = 52; }
+    }
+  }
+
+  y += 8;
+  doc.setFont("helvetica", "bold");
+  doc.text("Perguntas mais prováveis na banca (treine MUITO)", 40, y); y += 14;
+  doc.setFont("helvetica", "normal");
+
+  qLikely.forEach((q, i) => {
+    doc.text(`${i+1}. ${q.text}`, 40, y, { maxWidth: 520 }); y += 22;
+    if(y > 760){ doc.addPage(); y = 52; }
+  });
+
+  y += 6;
+  doc.setFont("helvetica", "bold");
+  doc.text("Estratégias de sobrevivência (frases de escape)", 40, y); y += 14;
+
+  doc.setFont("helvetica", "normal");
+  const escapes = [
+    "• “Excelente pergunta. Esse ponto foge do escopo do estudo, mas abre uma agenda futura objetiva: ______.”",
+    "• “No meu desenho atual eu não consigo afirmar causalidade, apenas associação. Para causalidade eu precisaria de ______.”",
+    "• “A limitação principal é ______. Eu mitiguei com ______, então a conclusão deve ser lida como ______.”",
+    "• “Uma interpretação alternativa é ______. Eu favoreço minha interpretação porque ______.”"
+  ];
+  escapes.forEach(line => {
+    doc.text(line, 40, y, { maxWidth: 520 }); y += 16;
+    if(y > 760){ doc.addPage(); y = 52; }
+  });
+
+  y += 8;
+  doc.setFont("helvetica", "bold");
+  doc.text("Registro do treino (amostra)", 40, y); y += 14;
+  doc.setFont("helvetica", "normal");
+  const last = session.answers.slice(-6);
+  last.forEach((a, i) => {
+    doc.text(`Q${session.answers.length - last.length + i + 1}: ${a.q.text}`, 40, y, { maxWidth: 520 }); y += 16;
+    doc.text(`Sua resposta (resumo): ${a.answer.slice(0, 180)}${a.answer.length>180?"…":""}`, 40, y, { maxWidth: 520 }); y += 22;
+    if(y > 760){ doc.addPage(); y = 52; }
+  });
+
+  doc.save(`guru-de-banca_relatorio_${name.replace(/\s+/g,"_")}.pdf`);
+}
+
+/* =========================
+   MAIN ACTIONS
+========================= */
+function buildCtx(){
+  return {
+    studentName: $("studentName").value.trim(),
+    level: $("level").value,
+    area: $("area").value,
+    severity: $("severity").value,
+  };
+}
+
+async function startWithPdf(){
+  const file = $("pdfInput").files?.[0];
+  const ctx = buildCtx();
+
+  if(!file){
+    toast("Sem PDF", "Carregue um PDF ou use o modo DEMO.");
+    return;
+  }
+
+  toast("Lendo PDF", "Extraindo texto… (seu navegador vai trabalhar um pouco)");
+  let extracted;
+  try{
+    extracted = await extractPdfText(file);
+  } catch(e){
+    console.error(e);
+    toast("Erro no PDF", "Não consegui ler esse PDF. Tente outro arquivo ou o modo DEMO.");
+    return;
+  }
+
+  const words = wordsCount(extracted.text);
+  const meta = detectSections(extracted.text);
+
+  session = makeEmptySession(ctx, meta);
+  session.meta.pages = extracted.pages;
+  session.meta.words = words;
+  session.meta.rawText = extracted.text.slice(0, 220000); // limite para não explodir storage
+
+  // perguntas
+  session.questions = buildQuestionBank({ level: ctx.level, area: ctx.area, severity: ctx.severity, meta });
+  session.qi = 0;
+  session.answers = [];
+
+  saveSession();
+
+  renderMeta(meta, extracted.pages, words);
+  $("qTotal").textContent = String(session.questions.length);
+  renderQuestion();
+  toast("Pronto", "Vamos começar. Responda como se estivesse na frente da banca.");
+}
+
+function startDemo(){
+  const ctx = buildCtx();
+  const demoText = `
+  Título: Efeitos de variáveis ambientais na dinâmica de um ecossistema urbano.
+  Introdução: Este trabalho discute...
+  Objetivo geral: avaliar a relação entre temperatura e um indicador ambiental.
+  Objetivos específicos: (1) descrever padrões, (2) testar associação...
+  Metodologia: séries temporais e análise estatística com modelos...
+  Resultados: observou-se aumento...
+  Discussão: interpretações...
+  Conclusão: recomendações...
+  Limitações: amostra e sazonalidade...
+  Referências: ...
+  `;
+  const meta = detectSections(demoText);
+  session = makeEmptySession(ctx, meta);
+  session.meta.pages = 12;
+  session.meta.words = wordsCount(demoText);
+  session.meta.rawText = demoText;
+
+  session.questions = buildQuestionBank({ level: ctx.level, area: ctx.area, severity: ctx.severity, meta });
+  session.qi = 0;
+  session.answers = [];
+
+  saveSession();
+
+  renderMeta(meta, session.meta.pages, session.meta.words);
+  $("qTotal").textContent = String(session.questions.length);
+  renderQuestion();
+  toast("DEMO ativo", "Isso é apenas simulação sem PDF real. Para valer, faça upload do PDF.");
+}
+
+function resume(){
+  const s = loadSession();
+  if(!s){
+    toast("Nada salvo", "Não encontrei sessão salva neste navegador.");
+    return;
+  }
+  session = s;
+  setModePill();
+  renderMeta(session.meta, session.meta.pages, session.meta.words);
+  $("qTotal").textContent = String(session.questions.length);
+  renderQuestion();
+  toast("Retomado", "Sessão carregada. Continue a simulação.");
+}
+
+function answerFlow(){
+  if(!session){
+    toast("Sem sessão", "Faça upload/análise ou use o modo DEMO.");
+    return;
+  }
+  const q = session.questions[session.qi];
+  if(!q){
+    toast("Fim", "Sem mais perguntas. Gere o relatório.");
+    return;
+  }
+  const ans = $("answer").value.trim();
+  if(!ans){
+    toast("Cadê a resposta?", "Em banca, silêncio não pontua. Escreva algo objetivo.");
+    return;
+  }
+
+  const score = evaluateAnswer(q, ans, session.ctx);
+
+  // follow-up (pode variar pela severidade)
+  let follow = q.follow;
+  if(session.ctx.severity === "hard"){
+    // faz follow-up mais agressivo se a resposta foi ruim
+    const a = avgScore(score);
+    if(a < 6.2){
+      follow = "Ok, mas isso NÃO respondeu a pergunta. Reformule em 2 frases: ponto + evidência. Agora.";
+    } else if(a < 7.2){
+      follow = "Certo, mas onde está a sua evidência? Me dê o dado/critério e a limitação na mesma resposta.";
+    }
+  }
+
+  session.answers.push({ q, answer: ans, score, at: nowISO() });
+
+  saveSession();
+  renderFeedback(score, follow);
+
+  // atualizar nota/progresso
+  const done = session.answers.length;
+  const total = session.questions.length;
+  $("qDone").textContent = String(done);
+  $("progressFill").style.width = total ? pct(done/total) : "0%";
+  $("liveGrade").textContent = computeGrade(session).final.toFixed(1);
+}
+
+function nextQuestion(){
+  if(!session) return;
+  session.qi++;
+  if(session.qi >= session.questions.length){
+    toast("Acabou", "Você terminou as perguntas. Gere o relatório final.");
+    session.qi = session.questions.length; // clamp
+    saveSession();
+    renderQuestion();
+    return;
+  }
+  saveSession();
+  renderQuestion();
+}
+
+async function finish(){
+  if(!session){
+    toast("Sem sessão", "Faça upload/análise ou use o modo DEMO.");
+    return;
+  }
+  if(session.answers.length < 4){
+    toast("Pouco treino", "Responda pelo menos 4 perguntas antes de gerar o relatório (senão vira chute).");
+    return;
+  }
+  toast("Gerando PDF", "Montando seu relatório final…");
+  await generatePdfReport(session);
+  toast("Relatório pronto", "PDF baixado. Agora treine as perguntas prováveis e repita o simulado.");
+}
+
+/* =========================
+   BUTTONS
+========================= */
+$("btnAnalyze").addEventListener("click", startWithPdf);
+$("btnLoadDemo").addEventListener("click", startDemo);
+$("btnResume").addEventListener("click", resume);
+$("btnReset").addEventListener("click", resetSession);
+
+$("btnAnswer").addEventListener("click", answerFlow);
+$("btnHint").addEventListener("click", ()=>{
+  if(!session) return toast("Sem sessão","Faça upload/análise ou use DEMO.");
+  const q = session.questions[session.qi];
+  const hint =
+    q.tags.includes("core") ? "Estruture em 2–3 frases: **problema/objetivo** + **por que importa** + **o que você fez**." :
+    q.tags.includes("metodo") ? "Diga: **por que escolheu** + **o que controla** + **o que não controla (limite)**." :
+    q.tags.includes("estatistica") ? "Diga: **o que você estima** + **qual suposição** + **como mede incerteza**." :
+    q.tags.includes("teoria") ? "Diga: **conceito central** + **autor/linha** + **como você operacionaliza**." :
+    "Diga: **achado** + **evidência** + **alternativa** + **limitação**.";
+  toast("Dica de banca", hint, 3200);
+});
+
+$("btnIDK").addEventListener("click", ()=>{
+  $("answer").value =
+`Eu não tenho esse detalhe de memória agora, mas posso responder com transparência:
+(1) O que eu consigo afirmar com segurança é: ______.
+(2) O que eu precisaria consultar/rodar para responder exatamente é: ______.
+(3) Isso não invalida o trabalho porque: ______.
+(4) Como agenda futura, eu faria: ______.`;
+  toast("Boa estratégia", "Use isso para NÃO travar na banca. Agora complete os campos.");
+});
+
+$("btnNext").addEventListener("click", nextQuestion);
+$("btnFinish").addEventListener("click", finish);
+
+/* init */
+renderIdle();
+</script>
+</body>
+</html>
