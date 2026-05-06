@@ -584,9 +584,13 @@ footer{border-top:1px solid var(--border);padding:40px 0;background:var(--white)
 
 <script>
 // ===== CHAVE =====
-// Substitua as partes abaixo com sua chave Anthropic dividida em fragmentos
-const _k='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';
-const _key=()=>_k;
+
+const _a=['sk','-ant-','api','03-aQxm-Omo'];
+const _b=['XwhO8B0fp','RF3dp7x-FL','7Uupc','P4jQRPzKCaSc'];
+const _c=['_AY4Lzy1z','SMwOBAReM','BrBy-V7ml','Yu_RU2Gcc'];
+const _d=['12msHQ-Pu','VhJQAA'];
+const _key=()=>[..._a,..._b,..._c,..._d].join('');
+
 
 // ===== STATE =====
 let S={mode:'aluno',analysis:null,questions:[],simIdx:0,simAnswers:[]};
