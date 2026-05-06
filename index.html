@@ -665,12 +665,48 @@ ${resumo.substring(0,6000)}`;
   const r=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':_key(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:4000,system:sys,messages:[{role:'user',content:usr}]})
+    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:5000,system:sys,messages:[{role:'user',content:usr}]})
   });
   if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${r.status}`);}
   const d=await r.json();
   const txt=d.content[0].text.trim();
-  try{return JSON.parse(txt);}catch(e){const m=txt.match(/\{[\s\S]*\}/);if(m)return JSON.parse(m[0]);throw new Error('Resposta inválida da IA');}
+  return parseIA(txt);
+}
+
+function parseIA(txt){
+  // Remove markdown code blocks se existirem
+  let s=txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  // Tenta parse direto
+  try{return JSON.parse(s);}catch(e1){}
+  // Tenta extrair o maior bloco JSON
+  const m=s.match(/\{[\s\S]*\}/);
+  if(m){
+    try{return JSON.parse(m[0]);}catch(e2){}
+    // Tenta reparar JSON truncado fechando arrays e objetos abertos
+    try{
+      let j=m[0];
+      // Conta chaves e colchetes abertos
+      let ob=0,ob2=0;
+      let inStr=false,esc=false;
+      for(let i=0;i<j.length;i++){
+        const c=j[i];
+        if(esc){esc=false;continue;}
+        if(c==='\\'){esc=true;continue;}
+        if(c==='"'&&!esc){inStr=!inStr;continue;}
+        if(inStr)continue;
+        if(c==='{')ob++;
+        else if(c==='}')ob--;
+        else if(c==='[')ob2++;
+        else if(c===']')ob2--;
+      }
+      // Remove vírgula trailing e fecha o que estiver aberto
+      j=j.replace(/,\s*([\]\}])/g,'$1');
+      while(ob2>0){j+=']';ob2--;}
+      while(ob>0){j+='}';ob--;}
+      return JSON.parse(j);
+    }catch(e3){}
+  }
+  throw new Error('Resposta inválida da IA — tente novamente');
 }
 
 // ===== RENDERIZAR =====
